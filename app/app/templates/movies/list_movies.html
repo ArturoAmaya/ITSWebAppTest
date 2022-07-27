@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block body %}
+<h1>Movies</h1>
+<div class="pull-right">
+    <a href="{{ url_for('movies:add-movie') }}" class="btn btn-primary"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span>Add movie</a>
+</div>
+<table class="table table-striped">
+    <thead>
+        <tr><th>Title</th><th>Release Year</th><th>Description</th></tr>
+    </thead>
+    <tbody>
+        {% for m in movies %}
+        <tr>
+            <td><a href="{{ url_for('movies:get-movie', movieId=m.movieId) }}">{{ m.title }}</a></td>
+            <td>{{ m.movieYear }}</td>
+            <td>{{ m.description }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+{% endblock %}

@@ -1,0 +1,35 @@
+nameOverride: "__APPNAME__"
+domain: "__DOMAIN__"
+hostName: "__EKSHOSTNAME__"
+appPath: "__APPNAME__"
+image:
+  repository: "__ARTIFACTORYREGISTRY__.__ARTIFACTORYBASEURL__/__ARTIFACTORYDOMAIN__/__ARTIFACTORYPROJECT__"
+  tag: "__ARTIFACTORYTAG__"
+deployment:
+  livenessProbe:
+    failureThreshold: 20
+    initialDelaySeconds: 60
+    periodSeconds: 5
+    successThreshold: 1
+    tcpSocket:
+      port: 8080
+  readinessProbe:
+    failureThreshold: 5
+    initialDelaySeconds: 60
+    periodSeconds: 20
+    successThreshold: 1
+    tcpSocket:
+      port: 8080
+env:
+  normal:
+    BASE_PATH: "/__APPNAME__"
+    ENV: "__ENV__"
+    LOG_LEVEL: "__LOG_LEVEL__"
+    WEB_APP_DEBUG: "__DEBUG_FLAG__"
+    WEB_APP_VERSION: "v1"
+    WEB_APP_TITLE: "Python API Archetype"
+    WEB_APP_DESCRIPTION: "A start Python API app with sample movies implementation."
+    DATABASE1_URL: "__DB1_URL__"
+  secret:
+    TEST_PASSWORD: "__TEST_PASSWORD__"
+

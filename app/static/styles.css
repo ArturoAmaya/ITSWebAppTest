@@ -1,0 +1,8 @@
+#batch_search_form {
+    display: none;
+}
+
+.student_picture {
+    width: 100%;
+    border: 3px solid #555;
+}
