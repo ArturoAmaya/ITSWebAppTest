@@ -10,7 +10,7 @@ WORKDIR /code
 # https://fastapi.tiangolo.com/deployment/docker/
 # we first copy the file with the dependencies alone, not the rest of the code
 COPY ./requirements.txt /code/requirements.txt
-COPY ./.env /code/.env
+#COPY ./.env /code/.env
 
 # 
 #RUN pip install --no-cache-dir --upgrade -r /code/requirements.txt
