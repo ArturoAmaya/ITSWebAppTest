@@ -60,7 +60,7 @@ env:
     - name: "APIM_SECRET_KEY"
       value: "emptysecretkey"
     - name: "SSO_IDP_CERT"
-      value: "__SSO_SECRET_CERT__"
+      value: "__SSO_IDP_CERT__"
     - name: "SSO_SP_CERT"
       value: "__SSO_SP_CERT__"
     - name: "SSO_SP_PRIVATE_KEY"
