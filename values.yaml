@@ -41,9 +41,9 @@ env:
     - name: "SSO_IDP_ENTITY_ID"
       value: "__SSO_IDP_ENTITY_ID__" # https://dev-ats-pub.ucsd.edu
     - name: "SSO_IDP_LOGIN_URL"
-      value: "__SSO_LOGIN_URL__"
+      value: "__SSO_IDP_LOGIN_URL__"
     - name: "SSO_IDP_LOGOUT_URL"
-      value: "__SSO_LOGOUT_URL__"
+      value: "__SSO_IDP_LOGOUT_URL__"
     - name: "APIM_TOKEN_URL"
       value: ""
     - name: "APIM_BASE_URL"
