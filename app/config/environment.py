@@ -16,10 +16,12 @@ class Settings(BaseSettings):
      # TODO Define required settings, including environment variables. Samples below.
     ENV: str
     LOG_LEVEL: str
-    SSO_LOGIN_URL: str
-    SSO_LOGOUT_URL: str
-    SSO_SECRET_CERT: str
+    SSO_IDP_LOGIN_URL: str
+    SSO_IDP_LOGOUT_URL: str
+    SSO_IDP_CERT: str
     SSO_IDP_ENTITY_ID: str
+    SSO_SP_CERT: str
+    SSO_SP_PRIVATE_KEY: str
     SSO_SP_ENTITY_ID: str
     SSO_REDIS_SESSION_PREFIX: str
     REDIS_URL: str

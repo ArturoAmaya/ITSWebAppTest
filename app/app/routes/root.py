@@ -51,15 +51,14 @@ def get_saml_settings(request: Request = Depends(Request)):
         "idp": {
             "entityId": _SETTINGS.SSO_IDP_ENTITY_ID,
             "singleSignOnService": {
-            "url": _SETTINGS.SSO_LOGIN_URL,
-            "binding": "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST"
+              "url": _SETTINGS.SSO_IDP_LOGIN_URL,
+              "binding": "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST"
             },
             "singleLogoutService": {
-            "url": _SETTINGS.SSO_LOGOUT_URL,
-            "binding": "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST"
+              "url": _SETTINGS.SSO_IDP_LOGOUT_URL,
+              "binding": "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST"
             },
-            "x509cert": _SETTINGS.SSO_SECRET_CERT,
-            "privateKey": ""
+            "x509cert": _SETTINGS.SSO_IDP_CERT,
         },
         "sp": {
             "entityId": _SETTINGS.SSO_SP_ENTITY_ID,
@@ -68,16 +67,16 @@ def get_saml_settings(request: Request = Depends(Request)):
             "binding": "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST"
             },
             "NameIDFormat": "urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified",
-            "x509cert": "",
-            "privateKey": ""
+            "x509cert": _SETTINGS.SSO_SP_CERT,
+            "privateKey": _SETTINGS.SSO_SP_PRIVATE_KEY
         },
         "security": {
             "nameIdEncrypted": True,
-        "requestedAuthnContext": ["urn:mace:ucsd.edu:sso:ad"],
+            "requestedAuthnContext": ["urn:mace:ucsd.edu:sso:ad"],
             "authnRequestsSigned": False,
             "logoutRequestSigned": False,
             "logoutResponseSigned": False,
-            "signMetadata": True,
+            "signMetadata": False,
             "wantMessagesSigned": True,
             "wantAssertionsSigned": True,
             "wantNameId" : False,
