@@ -36,8 +36,6 @@ env:
       value: "Canvas Tools"
     - name: "WEB_APP_DESCRIPTION"
       value: "Description here"
-    - name: "SSO_CALLBACK_URL"
-      value: "__SSO_CALLBACK_URL__" # http://127.0.0.1:8080/extension/saml/callback
     - name: "SSO_SP_ENTITY_ID"
       value: "__SSO_SP_ENTITY_ID__" # https://dev-ats-pub.ucsd.edu
     - name: "SSO_IDP_ENTITY_ID"

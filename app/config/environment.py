@@ -18,7 +18,6 @@ class Settings(BaseSettings):
     LOG_LEVEL: str
     SSO_LOGIN_URL: str
     SSO_LOGOUT_URL: str
-    SSO_CALLBACK_URL: str
     SSO_SECRET_CERT: str
     SSO_IDP_ENTITY_ID: str
     SSO_SP_ENTITY_ID: str
