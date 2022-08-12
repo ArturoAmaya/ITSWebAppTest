@@ -7,11 +7,9 @@ EXPOSE 8080
 # 
 WORKDIR /code
 
-#COPY ./.env /code/.env
-
 # https://fastapi.tiangolo.com/deployment/docker/
 # we first copy the file with the dependencies alone, not the rest of the code
-COPY ./requirements.txt /code/requirements.txt
+COPY ./requirements.txt ./.env* /code/
 
 #RUN pip install --no-cache-dir --upgrade -r /code/requirements.txt
 RUN python3 -m pip install --no-cache-dir --upgrade -r /code/requirements.txt
