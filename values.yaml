@@ -52,8 +52,6 @@ env:
       value: "ati_canvas_tools"
     - name: "DATABASE1_URL"
       value: "__DATABASE1_URL__"
-    - name: "FORWARDED_ALLOW_IPS"
-      value: "*"
   secret:
     - name: "TEST_PASSWORD"
       value: "__TEST_PASSWORD__"
