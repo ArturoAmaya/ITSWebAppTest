@@ -5,6 +5,16 @@ _SETTINGS = get_settings()
 CONFIG = {
             'entityid': _SETTINGS.SSO_IDP_ENTITY_ID,
             'service': {
+                'idp':{
+                    'endpoints': {
+                        "single_sign_on_service": [
+                            (
+                                _SETTINGS.SSO_IDP_LOGIN_URL,
+                                BINDING_HTTP_REDIRECT,
+                            ),
+                        ],
+                    }
+                },
                 'sp': {
                     'endpoints': {
                         "assertion_consumer_service": [
@@ -12,12 +22,6 @@ CONFIG = {
 							BINDING_HTTP_POST,
 							),
 						],
-                        "single_sign_on_service": [
-                            (
-                                _SETTINGS.SSO_IDP_LOGIN_URL,
-                                BINDING_HTTP_POST,
-                            ),
-                        ],
                         "single_logout_service": [
                             (
                                 _SETTINGS.SSO_IDP_LOGOUT_URL,

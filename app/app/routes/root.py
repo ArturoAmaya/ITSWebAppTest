@@ -53,6 +53,16 @@ def get_saml_client():
     CONFIG = {
             'entityid': _SETTINGS.SSO_IDP_ENTITY_ID,
             'service': {
+                'idp':{
+                    'endpoints': {
+                        "single_sign_on_service": [
+                            (
+                                _SETTINGS.SSO_IDP_LOGIN_URL,
+                                BINDING_HTTP_REDIRECT,
+                            ),
+                        ],
+                    }
+                },
                 'sp': {
                     'endpoints': {
                         "assertion_consumer_service": [
@@ -60,12 +70,6 @@ def get_saml_client():
 							BINDING_HTTP_POST,
 							),
 						],
-                        "single_sign_on_service": [
-                            (
-                                _SETTINGS.SSO_IDP_LOGIN_URL,
-                                BINDING_HTTP_POST,
-                            ),
-                        ],
                         "single_logout_service": [
                             (
                                 _SETTINGS.SSO_IDP_LOGOUT_URL,
@@ -90,10 +94,7 @@ def get_saml_client():
             },        
             "key_file": "app/config/sp-key.pem",        
             "cert_file": "app/config/sp-cert.pem",
-            "xmlsec_binary": '/usr/bin/xmlsec1',
-            "metadata": {
-                "local": ["app/config/sp.xml"],
-            },        
+            "xmlsec_binary": '/usr/bin/xmlsec1',        
             'encryption_keypairs': [
             {
                 "key_file": "app/config/sp-key.pem",        
@@ -119,8 +120,11 @@ def get_saml_client():
 
 @router.get('/saml/login', name="saml:login")
 async def saml_login(request: Request):
+    print("before saml_client")
     saml_client = get_saml_client()
-    reqid, info = saml_client.prepare_for_authenticate()
+    print("after saml_client")
+    reqid, info = saml_client.prepare_for_authenticate(entityid=_SETTINGS.SSO_IDP_ENTITY_ID)
+    print("after prepare for authenticate")
 
     redirect_url = None
     # Select the IdP URL to send the AuthN request to
