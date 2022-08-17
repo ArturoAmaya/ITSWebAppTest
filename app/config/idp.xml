@@ -1,0 +1,87 @@
+<!-- 
+This is example IdP metadata for demonstration purposes. Each party
+in a Shibboleth/SAML deployment requires metadata from its opposite(s).
+Thus, your metadata describes you and is given to your partners, and your
+partners' metadata is fed into your configuration.
+
+This particular file isn't used for anything directly, it's just an example
+to help with constructing metadata for an IdP that may not supply its
+metadata to you properly.
+ -->
+<EntityDescriptor xmlns="urn:oasis:names:tc:SAML:2.0:metadata" xmlns:ds="http://www.w3.org/2000/09/xmldsig#" xmlns:shibmd="urn:mace:shibboleth:metadata:1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" entityID="https://a4.ucsd.edu/shibboleth">
+<!-- xsi:schemaLocation="urn:oasis:names:tc:SAML:2.0:metadata saml-schema-metadata-2.0.xsd urn:mace:shibboleth:metadata:1.0 shibboleth-metadata-1.0.xsd http://www.w3.org/2000/09/xmldsig# xmldsig-core-schema.xsd"
+    validUntil="2020-01-01T00:00:00Z" -->
+<!-- 
+    The entityID above looks like a location, but it's actually just a name.
+    Each entity is assigned a URI name. By convention, it will often be a
+    URL, but it should never contain a physical machine hostname that you
+    would not otherwise publish to users of the service. For example, if your
+    installation runs on a machine named "gryphon.example.org", you would
+    generally register that machine in DNS under a second, logical name
+    (such as a4-test.ucsd.edu). This logical name should be used in favor
+    of the real hostname when you assign an entityID. You should use a name
+    like this even if you don't actually register the server in DNS using it.
+    The URL does not have to resolve into anything to use it as a name, although
+    it is useful if it does in fact point to your metadata. The key point is
+    for the name you choose to be stable, which is why including hostnames is
+    generally bad, since they tend to change.
+     -->
+<!--  A Shibboleth 1.x and SAML 2.0 IdP contains this element with protocol support as shown.  -->
+<IDPSSODescriptor protocolSupportEnumeration="urn:mace:shibboleth:1.0 urn:oasis:names:tc:SAML:1.1:protocol urn:oasis:names:tc:SAML:2.0:protocol">
+<Extensions>
+<!--  This is a Shibboleth extension to express attribute scope rules.  -->
+<shibmd:Scope>ucsd.edu</shibmd:Scope>
+</Extensions>
+<!-- 
+        One or more KeyDescriptors tell your SP how the IdP will authenticate itself. A single
+        descriptor can be used for both signing and for server-TLS if its use attribute
+        is set to "signing". You can place an X.509 certificate directly in this element
+        to specify the public key to use. This only reflects the public half of the keypair
+        used by the IdP. A different key, or the same key, can be specified for enabling
+        the SP to encrypt XML it sends to the IdP. 
+         -->
+<KeyDescriptor>
+<ds:KeyInfo>
+<ds:X509Data>
+<ds:X509Certificate> MIIC9jCCAd6gAwIBAgIJAJVf9Zyk5ITIMA0GCSqGSIb3DQEBBQUAMCkxJzAlBgNV BAMTHmh0dHBzOi8vYTQudWNzZC5lZHUvc2hpYmJvbGV0aDAeFw0xNDA5MDIxNjMy MjdaFw0yNDA4MzAxNjMyMjdaMCkxJzAlBgNVBAMTHmh0dHBzOi8vYTQudWNzZC5l ZHUvc2hpYmJvbGV0aDCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBANEV DD73IdU/jduUbk+9Sa0zNBCs5igBKQ2X6Z4znZOYvk2yEGz4sNp/CmKNeyDPAa0L rZiiYEy+innWGG9pY8QpI+f4z5OCSmSq9uNC9gwMzfCPiI4fmMWjdlG0z4ZOBhDC xrVUS48jg0Exw7Ak4SB1ssJWqPcq7CYgXK+2DfJvtpWMNe2utYw+D0cfonymSy1L RMfKssIH0MHSLTwu4nX6h4cE4X4DLW3HF+7l7rimkeWkLhovQF04TAIYnAcBhiY0 Z/uz/NpwppRhz4MQvqbWkLwBJ2Hjy2EKsRdIMr8epAcXSXweC/Fo810C2sJ28zDG 6iyQDHRaVVEM6uyYz8kCAwEAAaMhMB8wHQYDVR0OBBYEFFAVPGZDvzSpgBMFJ2qW gaNcaziZMA0GCSqGSIb3DQEBBQUAA4IBAQCnHl/NWsmsIOnLd5t62pbLTjzDpOyx VsLfWlm+SWWdnWIaQg8Tzu1wdoS0b12hSb9vmyA2Pxx7s8sQw9f4AgZ9rgFLbuZ4 cB9fxQyf4EhbiqwuD7ucaK4Ys2X0RC4PAVFPoy/V35OQyROpZFpLKQf49j5FnLw3 PgN5FPFH3mhFBXQTAI/zPtUyCg3VlFh71AMNo+rHep/oacIPlxYyNWrtwQ1LHSjO 7ta15T4Kem84A6MvdJWAdqeeX4DiW6wFgvi+HdNBX+dvQ53wX3oPfNVr9N+pN6E6 OwLWG1WBnlcp0Mm0A2UFtEUCKdTLEHmsB+v+6PsjNKu6XYkVXR9sxRF/ </ds:X509Certificate>
+</ds:X509Data>
+</ds:KeyInfo>
+</KeyDescriptor>
+<NameIDFormat>urn:mace:shibboleth:1.0:nameIdentifier</NameIDFormat>
+<NameIDFormat>urn:oasis:names:tc:SAML:2.0:nameid-format:transient</NameIDFormat>
+<NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified</NameIDFormat>
+<!--  This tells the SP how and where to request authentication.  -->
+<SingleSignOnService Binding="urn:mace:shibboleth:1.0:profiles:AuthnRequest" Location="https://a4-test.ucsd.edu/testidp/HS"/>
+<SingleSignOnService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" Location="https://a4-test.ucsd.edu/testidp/profile/SAML2/POST/SSO"/>
+</IDPSSODescriptor>
+<!--  Most Shibboleth IdPs also support SAML attribute queries, so this role is also included.  -->
+<AttributeAuthorityDescriptor protocolSupportEnumeration="urn:oasis:names:tc:SAML:1.1:protocol urn:oasis:names:tc:SAML:2.0:protocol">
+<Extensions>
+<!--  This is a Shibboleth extension to express attribute scope rules.  -->
+<shibmd:Scope>ucsd.edu</shibmd:Scope>
+</Extensions>
+<!--  The certificate has to be repeated here (or a different one specified if necessary).  -->
+<KeyDescriptor>
+<ds:KeyInfo>
+<ds:X509Data>
+<ds:X509Certificate> MIIC9jCCAd6gAwIBAgIJAJVf9Zyk5ITIMA0GCSqGSIb3DQEBBQUAMCkxJzAlBgNV BAMTHmh0dHBzOi8vYTQudWNzZC5lZHUvc2hpYmJvbGV0aDAeFw0xNDA5MDIxNjMy MjdaFw0yNDA4MzAxNjMyMjdaMCkxJzAlBgNVBAMTHmh0dHBzOi8vYTQudWNzZC5l ZHUvc2hpYmJvbGV0aDCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBANEV DD73IdU/jduUbk+9Sa0zNBCs5igBKQ2X6Z4znZOYvk2yEGz4sNp/CmKNeyDPAa0L rZiiYEy+innWGG9pY8QpI+f4z5OCSmSq9uNC9gwMzfCPiI4fmMWjdlG0z4ZOBhDC xrVUS48jg0Exw7Ak4SB1ssJWqPcq7CYgXK+2DfJvtpWMNe2utYw+D0cfonymSy1L RMfKssIH0MHSLTwu4nX6h4cE4X4DLW3HF+7l7rimkeWkLhovQF04TAIYnAcBhiY0 Z/uz/NpwppRhz4MQvqbWkLwBJ2Hjy2EKsRdIMr8epAcXSXweC/Fo810C2sJ28zDG 6iyQDHRaVVEM6uyYz8kCAwEAAaMhMB8wHQYDVR0OBBYEFFAVPGZDvzSpgBMFJ2qW gaNcaziZMA0GCSqGSIb3DQEBBQUAA4IBAQCnHl/NWsmsIOnLd5t62pbLTjzDpOyx VsLfWlm+SWWdnWIaQg8Tzu1wdoS0b12hSb9vmyA2Pxx7s8sQw9f4AgZ9rgFLbuZ4 cB9fxQyf4EhbiqwuD7ucaK4Ys2X0RC4PAVFPoy/V35OQyROpZFpLKQf49j5FnLw3 PgN5FPFH3mhFBXQTAI/zPtUyCg3VlFh71AMNo+rHep/oacIPlxYyNWrtwQ1LHSjO 7ta15T4Kem84A6MvdJWAdqeeX4DiW6wFgvi+HdNBX+dvQ53wX3oPfNVr9N+pN6E6 OwLWG1WBnlcp0Mm0A2UFtEUCKdTLEHmsB+v+6PsjNKu6XYkVXR9sxRF/ </ds:X509Certificate>
+</ds:X509Data>
+</ds:KeyInfo>
+</KeyDescriptor>
+<!--  This tells the SP how and where to send queries.  -->
+<AttributeService Binding="urn:oasis:names:tc:SAML:1.0:bindings:SOAP-binding" Location="https://a4-test.ucsd.edu/testidp/AA"/>
+<NameIDFormat>urn:mace:shibboleth:1.0:nameIdentifier</NameIDFormat>
+<NameIDFormat>urn:oasis:names:tc:SAML:2.0:nameid-format:transient</NameIDFormat>
+<NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified</NameIDFormat>
+</AttributeAuthorityDescriptor>
+<!--  This is just information about the entity in human terms.  -->
+<Organization>
+<OrganizationName xml:lang="en">UCSD Test</OrganizationName>
+<OrganizationDisplayName xml:lang="en">UCSD Test</OrganizationDisplayName>
+<OrganizationURL xml:lang="en">http://www.ucsd.edu/</OrganizationURL>
+</Organization>
+<ContactPerson contactType="technical">
+<SurName>Matthew Elder</SurName>
+<EmailAddress>m1elder@ucsd.edu</EmailAddress>
+</ContactPerson>
+</EntityDescriptor>

@@ -5,22 +5,15 @@ _SETTINGS = get_settings()
 CONFIG = {
             'entityid': _SETTINGS.SSO_IDP_ENTITY_ID,
             'service': {
-                'idp':{
-                    'endpoints': {
-                        "single_sign_on_service": [
-                            (
-                                _SETTINGS.SSO_IDP_LOGIN_URL,
-                                BINDING_HTTP_REDIRECT,
-                            ),
-                        ],
-                    }
-                },
                 'sp': {
                     'endpoints': {
                         "assertion_consumer_service": [
-							(_SETTINGS.SSO_SP_ENTITY_ID, 
+							("https://a4-test.ucsd.edu/testidp/profile/SAML2/POST/SSO", 
 							BINDING_HTTP_POST,
 							),
+                            ("https://a4-test.ucsd.edu/testidp/profile/SAML2/Redirect/SSO",
+                            BINDING_HTTP_REDIRECT,
+                            ),
 						],
                         "single_logout_service": [
                             (
