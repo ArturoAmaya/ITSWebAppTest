@@ -25,6 +25,14 @@ from fastapi_redis_session import deleteSession, getSessionId, getSessionStorage
 
 from fastapi_redis_session.config import basicConfig
 
+from saml2 import (
+    BINDING_HTTP_POST,
+    BINDING_HTTP_REDIRECT,
+    entity,
+)
+
+from saml2.config import Config as Saml2Config
+from saml2.client import Saml2Client
 
 BASE_PATH = Path(__file__).parent.resolve()
 
@@ -41,103 +49,90 @@ def setSession(response: Response, session: Any, sessionStorage: SessionStorage)
     response.set_cookie("ssid", sessionId, httponly=True, secure=True, expires=3000)
     return sessionId
 
-
-
-
-def get_saml_settings(request: Request = Depends(Request)): 
-    return {
-        "strict": False, # can set to True to see problems such as Time skew/drift
-        "debug": True,
-        "idp": {
-            "entityId": _SETTINGS.SSO_IDP_ENTITY_ID,
-            "singleSignOnService": {
-              "url": _SETTINGS.SSO_IDP_LOGIN_URL,
-              "binding": "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST"
+def get_saml_client():
+    CONFIG = {
+            'entityid': _SETTINGS.SSO_IDP_ENTITY_ID,
+            'service': {
+                'sp': {
+                    'endpoints': {
+                        "assertion_consumer_service": [
+							(_SETTINGS.SSO_SP_ENTITY_ID, 
+							BINDING_HTTP_POST,
+							),
+						],
+                        "single_sign_on_service": [
+                            (
+                                _SETTINGS.SSO_IDP_LOGIN_URL,
+                                BINDING_HTTP_POST,
+                            ),
+                        ],
+                        "single_logout_service": [
+                            (
+                                _SETTINGS.SSO_IDP_LOGOUT_URL,
+                                BINDING_HTTP_POST,
+                            ),
+                        ],
+                    },
+					"requestedAuthnContext": {
+						"authn_context_class_ref": [
+							"urn:mace:ucsd.edu:sso:ad",
+							],
+						},
+                    "required_attributes": ['urn:mace:ucsd.edu:sso:ad:username'],
+                    "metadata_key_usage" : "both",
+                    "enc_cert": "use",                               
+                    'allow_unsolicited': True,                              
+                    'authn_requests_signed': False,
+                    'logout_requests_signed': False,
+                    'want_assertions_signed': True,
+                    'want_response_signed': False,
+                },
+            },        
+            "key_file": "app/config/sp-key.pem",        
+            "cert_file": "app/config/sp-cert.pem",
+            "xmlsec_binary": '/usr/bin/xmlsec1',
+            "metadata": {
+                "local": ["app/config/sp.xml"],
+            },        
+            'encryption_keypairs': [
+            {
+                "key_file": "app/config/sp-key.pem",        
+                "cert_file": "app/config/sp-cert.pem",
             },
-            "singleLogoutService": {
-              "url": _SETTINGS.SSO_IDP_LOGOUT_URL,
-              "binding": "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST"
-            },
-            "x509cert": _SETTINGS.SSO_IDP_CERT,
-        },
-        "sp": {
-            "entityId": _SETTINGS.SSO_SP_ENTITY_ID,
-            "assertionConsumerService": {
-            "url": request.url_for("saml:callback"),
-            "binding": "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST"
-            },
-            "NameIDFormat": "urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified",
-            "x509cert": _SETTINGS.SSO_SP_CERT,
-            "privateKey": _SETTINGS.SSO_SP_PRIVATE_KEY
-        },
-        "security": {
-            "nameIdEncrypted": True,
-            "requestedAuthnContext": ["urn:mace:ucsd.edu:sso:ad"],
-            "authnRequestsSigned": False,
-            "logoutRequestSigned": False,
-            "logoutResponseSigned": False,
-            "signMetadata": False,
-            "wantMessagesSigned": True,
-            "wantAssertionsSigned": True,
-            "wantNameId" : False,
-            "wantNameIdEncrypted": False,
-            "wantAssertionsEncrypted": False,
-            "allowSingleLabelDomains": False,
-            "signatureAlgorithm": "http://www.w3.org/2001/04/xmldsig-more#rsa-sha256",
-            "digestAlgorithm": "http://www.w3.org/2001/04/xmlenc#sha256"
-        },
-        "contactPerson": {
-            "technical": {
-                "givenName": "Datahub Team",
-                "emailAddress": "datahub@ucsd.edu"
-            },
-            "support": {
-                "givenName": "Datahub Team",
-                "emailAddress": "datahub@ucsd.edu"
-            }
-        },
-        "organization": {
-            "en-US": {
-                "name": "UCSD",
-                "displayname": "University of California, San Diego",
+            ],
+            "organization": {
+                "name": ["Academic Technology Innovation"],
+                "display_name": ["Academic Technology Innovation"],
                 "url": "https://ucsd.edu"
-            }
-        }
+            },
+            "contact_person": [
+                {
+                    "mail": "its-academictechinnovation@ucsd.edu"
+                }
+            ]
     }
-
-async def prepare_from_fastapi_request(request: Request, debug=False):
-  form_data = await request.form()
-  rv = {
-    "http_host": request.client.host,
-    "server_port": request.url.port,
-    "script_name": request.url.path,
-    "post_data": { },
-    "get_data": { }
-    # Advanced request options
-    # "https": "",
-    # "request_uri": "",
-    # "query_string": "",
-    # "validate_signature_from_qs": False,
-    # "lowercase_urlencoding": False
-  }
-  if (request.query_params):
-    rv["get_data"] = request.query_params,
-  if "SAMLResponse" in form_data:
-    SAMLResponse = form_data["SAMLResponse"]
-    rv["post_data"]["SAMLResponse"] = SAMLResponse
-  if "RelayState" in form_data:
-    RelayState = form_data["RelayState"]
-    rv["post_data"]["RelayState"] = RelayState
-  return rv
+    spConfig = Saml2Config()
+    spConfig.load(CONFIG)
+    spConfig.allow_unknown_attributes = True
+    saml_client = Saml2Client(config=spConfig)
+    return saml_client
 
 @router.get('/saml/login', name="saml:login")
 async def saml_login(request: Request):
-  req = await prepare_from_fastapi_request(request)
-  auth = OneLogin_Saml2_Auth(req, get_saml_settings(request))
-  callback_url = auth.login(return_to=request.url_for('movies:get-movies')) # TODO figure out how to capture where we originally came from
-  response = RedirectResponse(url=callback_url)
-  return response
+    saml_client = get_saml_client()
+    reqid, info = saml_client.prepare_for_authenticate()
 
+    redirect_url = None
+    # Select the IdP URL to send the AuthN request to
+    for key, value in info['headers']:
+        if key == 'Location':
+            redirect_url = value
+    response = RedirectResponse(redirect_url)
+    response.headers['Cache-Control'] = 'no-cache, no-store'
+    response.headers['Pragma'] = 'no-cache'
+    return response
+
+"""
 @router.get('/saml/logout', name="saml:logout")
 async def saml_logout(request: Request, sessionId: str = Depends(getSessionId), 
 sessionStorage: SessionStorage = Depends(getSessionStorage)):
@@ -196,3 +191,4 @@ async def saml_metadata(request: Request):
   else:
     print("Error found on Metadata: %s" % (', '.join(errors)))
     raise HTTPException(500, "Error in SP metadata.")
+"""
