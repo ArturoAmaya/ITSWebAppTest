@@ -8,6 +8,7 @@ from starlette.middleware.base import BaseHTTPMiddleware
 from toolz import pipe
 
 from app.app.errors.http_error import http_error_handler, validation_error_handler
+from app.app.errors.user_info_error import get_user_info_exception_handler, UserInfoException
 from app.app.routes import register_routers as register_routers
 from app.config.environment import Settings
 from app.infrastructure.database.db import create_db_and_tables, init_db
@@ -61,6 +62,7 @@ def register_exception_handlers(app: FastAPI) -> FastAPI:
     # app.add_exception_handler(HTTPException, http_error_handler)
     # app.add_exception_handler(StarletteHTTPException, http_error_handler)
     # app.add_exception_handler(RequestValidationError, validation_error_handler)
+    app.add_exception_handler(UserInfoException, get_user_info_exception_handler)
     return app
     
 

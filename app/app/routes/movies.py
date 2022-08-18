@@ -9,26 +9,38 @@ from app.domain.protocols.services.movies import MoviesService as MoviesServiceP
 from app.domain.services.movies import MoviesService
 from app.domain.models.movie import Movie, MovieCreate, MovieRead, MovieReplace, MovieUpdate
 
+from fastapi_redis_session import getSessionStorage, SessionStorage
+from app.domain.services.user import get_user_info
+
 router = APIRouter()
 templates = Jinja2Templates(directory="app/app/templates")
 
+# all routes except "/" are SSO-protected by intiailizing the session variable
+# which checks for a login cookie
+# this also depends on the sessionStorage variable being declared as a dependency to your routing function
 
 @router.get("/", name="movies:get-movies",response_class=HTMLResponse)
-async def list_movies(request: Request, movies_service = Depends(MoviesService)):
+async def list_movies(request: Request, movies_service = Depends(MoviesService), sessionStorage: SessionStorage = Depends(getSessionStorage)):
     movies = await movies_service.list_movies()
     return templates.TemplateResponse("movies/list_movies.html", {"request": request, "movies": movies}) 
 
-@router.get("/add", name="movies:add-movie",response_class=HTMLResponse)
+@router.get("/add", name="movies:add-movie", response_class=HTMLResponse)
 async def add_movies(request: Request):
+    session = await get_user_info(request)
+
     return templates.TemplateResponse("movies/add_movie.html", {"request": request}) 
 
 @router.get("/edit/{movieId}", name="movies:edit-movie",response_class=HTMLResponse)
-async def edit_movie(request: Request, movieId: int, movies_service: MoviesServiceProtocol = Depends(MoviesService)):
+async def edit_movie(request: Request, movieId: int, movies_service: MoviesServiceProtocol = Depends(MoviesService), sessionStorage: SessionStorage = Depends(getSessionStorage)):
+    session = await get_user_info(request)
+
     movie = await movies_service.get_movie(movieId)
     return templates.TemplateResponse("movies/edit_movie.html", {"request": request, "movie": movie}) 
 
 @router.get("/view/{movieId}", name="movies:get-movie", response_model=MovieRead)
-async def get_movie_by_id(request: Request, movieId: int,  movies_service: MoviesServiceProtocol = Depends(MoviesService)) -> Optional[Movie]:
+async def get_movie_by_id(request: Request, movieId: int,  movies_service: MoviesServiceProtocol = Depends(MoviesService), sessionStorage: SessionStorage = Depends(getSessionStorage)) -> Optional[Movie]:
+    session = await get_user_info(request)
+
     movie = await movies_service.get_movie(movieId)
     if not movie:
         raise HTTPException(404, "Movie not found")
@@ -40,7 +52,11 @@ async def save_movie(request: Request,
                      title: str = Form(...), 
                      description: str = Form(...), 
                      year: int = Form(...), 
-                     movies_service: MoviesServiceProtocol = Depends(MoviesService)) -> Movie:
+                     movies_service: MoviesServiceProtocol = Depends(MoviesService), 
+                     sessionStorage: SessionStorage = Depends(getSessionStorage)) -> Movie:
+    
+    session = await get_user_info(request)
+    
     if id:
         existingMovie = await movies_service.get_movie(id)
         if not existingMovie:
@@ -59,7 +75,11 @@ async def save_movie(request: Request,
     return RedirectResponse(url = url, status_code=302)
 
 @router.post("/delete", name="movies:delete-movie", response_class=RedirectResponse)
-async def delete_movie(request: Request, movieId: int = Form(...), movies_service: MoviesServiceProtocol = Depends(MoviesService)) -> Response:
+async def delete_movie(request: Request, movieId: int = Form(...), movies_service: MoviesServiceProtocol = Depends(MoviesService), 
+sessionStorage: SessionStorage = Depends(getSessionStorage)) -> Response:
+    
+    session = await get_user_info(request)
+
     movie = await movies_service.get_movie(movieId)
     
     if not movie:

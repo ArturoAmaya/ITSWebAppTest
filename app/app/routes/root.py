@@ -107,13 +107,23 @@ def get_saml_client(request: Request = Depends(Request)):
     saml_client = Saml2Client(config=spConfig)
     return saml_client
 
+def validateRelayState(RelayState):
+    # TODO: validate that URL is plausible for our website better
+    if(_SETTINGS.BASE_PATH in RelayState):
+        return True
+    else:
+        return False
+
 @router.get('/saml/login', name="saml:login")
 async def saml_login(request: Request):
-    print("before saml_client")
+
+    RelayState = ""
+
+    if('target' in request.query_params):
+        RelayState = request.query_params['target']
+
     saml_client = get_saml_client(request)
-    print("after saml_client")
-    reqid, info = saml_client.prepare_for_authenticate()
-    print("after prepare for authenticate")
+    reqid, info = saml_client.prepare_for_authenticate(relay_state = RelayState)
 
     redirect_url = None
     # Select the IdP URL to send the AuthN request to
@@ -128,14 +138,10 @@ async def saml_login(request: Request):
 @router.get('/saml/logout', name="saml:logout")
 async def saml_logout(request: Request, sessionId: str = Depends(getSessionId), 
 sessionStorage: SessionStorage = Depends(getSessionStorage)):
-  pass
-  # req = await prepare_from_fastapi_request(request)
-  # auth = OneLogin_Saml2_Auth(req, get_saml_settings(request))
-  # callback_url = auth.logout()
-  # response = RedirectResponse(url=callback_url)
-  # deleteSession(sessionId, sessionStorage)
-  # response.delete_cookie(key="ssid")
-  # return response
+  response = RedirectResponse(url=_SETTINGS.SSO_IDP_LOGOUT_URL)
+  deleteSession(sessionId, sessionStorage)
+  response.delete_cookie(key="ssid")
+  return response
 
 @router.post('/saml/callback', name="saml:callback")
 async def saml_login_callback(request: Request, response: Response, sessionStorage: SessionStorage = Depends(getSessionStorage), SAMLResponse = Form(...), RelayState = Form(None)):
@@ -148,31 +154,24 @@ async def saml_login_callback(request: Request, response: Response, sessionStora
 
     user_login_json = {
         "username":attributes['urn:mace:ucsd.edu:sso:ad:username'][0],
-        "role":"student",
-        "pid": "U0000000"
     }
 
-    setSession(response, user_login_json, sessionStorage)
-
-    if RelayState is not None:
-        response_url = RelayState
+    # handles where to go after callback
+    if RelayState is not None and RelayState != "" and validateRelayState(RelayState):
+        response_url = RelayState # if login is called by a protected route, will go to this page when logged in
     else:
-        response_url = request.base_url
+        # will go to root URL if login is called directly. feel free to change
+        # currently doesn't lead anywhere, as saml/login isn't meant to be called directly
+        response_url = str(request.base_url) + _SETTINGS.BASE_PATH[1:]
     
     response = RedirectResponse(response_url)
     response.status_code = 302
+    setSession(response, user_login_json, sessionStorage) # needs to be after response is initialized
     return response
     
 @router.get('/saml/metadata', name="saml:metadata")
 async def saml_metadata(request: Request):
-  pass
-  # req = await prepare_from_fastapi_request(request)
-  # auth = OneLogin_Saml2_Auth(req, get_saml_settings(request))
-  # saml_settings = auth.get_settings()
-  # metadata = saml_settings.get_sp_metadata()
-  # errors = saml_settings.validate_metadata(metadata)
-  # if len(errors) == 0:
-  #   return Response(content=metadata, media_type="application/xml")
-  # else:
-  #   print("Error found on Metadata: %s" % (', '.join(errors)))
-  #   raise HTTPException(500, "Error in SP metadata.")
+    # to do: dynamically generate this
+    f = open("app/config/sp.xml", "r")
+    data = f.read()
+    return Response(content=data, media_type="application/xml")
