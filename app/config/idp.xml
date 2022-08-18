@@ -53,6 +53,7 @@ metadata to you properly.
 <!--  This tells the SP how and where to request authentication.  -->
 <SingleSignOnService Binding="urn:mace:shibboleth:1.0:profiles:AuthnRequest" Location="https://a4-test.ucsd.edu/testidp/HS"/>
 <SingleSignOnService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" Location="https://a4-test.ucsd.edu/testidp/profile/SAML2/POST/SSO"/>
+<SingleSignOnService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect" Location="https://a4-test.ucsd.edu/testidp/profile/SAML2/Redirect/SSO"/>
 </IDPSSODescriptor>
 <!--  Most Shibboleth IdPs also support SAML attribute queries, so this role is also included.  -->
 <AttributeAuthorityDescriptor protocolSupportEnumeration="urn:oasis:names:tc:SAML:1.1:protocol urn:oasis:names:tc:SAML:2.0:protocol">

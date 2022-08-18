@@ -49,27 +49,19 @@ def setSession(response: Response, session: Any, sessionStorage: SessionStorage)
     response.set_cookie("ssid", sessionId, httponly=True, secure=True, expires=3000)
     return sessionId
 
-def get_saml_client():
+def get_saml_client(request: Request = Depends(Request)):
     CONFIG = {
-            'entityid': _SETTINGS.SSO_IDP_ENTITY_ID,
+            'entityid': _SETTINGS.SSO_SP_ENTITY_ID,
             'service': {
-                'sp': {
-                    'endpoints': {
-                        "assertion_consumer_service": [
-							("https://a4-test.ucsd.edu/testidp/profile/SAML2/POST/SSO", 
-							BINDING_HTTP_POST,
-							),
-                            ("https://a4-test.ucsd.edu/testidp/profile/SAML2/Redirect/SSO",
-                            BINDING_HTTP_REDIRECT,
-                            ),
-						],
-                        "single_logout_service": [
-                            (
-                                _SETTINGS.SSO_IDP_LOGOUT_URL,
-                                BINDING_HTTP_POST,
-                            ),
-                        ],
-                    },
+              'sp': {
+                'endpoints': {
+                  "assertion_consumer_service": [
+                    (request.url_for("saml:callback"), BINDING_HTTP_POST)
+                  ],
+                  "single_logout_service": [
+                    (request.url_for("saml:logout"), BINDING_HTTP_REDIRECT)
+                  ]
+                },
 					"requestedAuthnContext": {
 						"authn_context_class_ref": [
 							"urn:mace:ucsd.edu:sso:ad",
@@ -119,9 +111,10 @@ def get_saml_client():
 @router.get('/saml/login', name="saml:login")
 async def saml_login(request: Request):
     print("before saml_client")
-    saml_client = get_saml_client()
+    saml_client = get_saml_client(request)
     print("after saml_client")
-    reqid, info = saml_client.prepare_for_authenticate(entityid=_SETTINGS.SSO_IDP_ENTITY_ID)
+    reqid, info = saml_client.prepare_for_authenticate()
+    print(info)
     print("after prepare for authenticate")
 
     redirect_url = None
@@ -134,7 +127,6 @@ async def saml_login(request: Request):
     response.headers['Pragma'] = 'no-cache'
     return response
 
-"""
 @router.get('/saml/logout', name="saml:logout")
 async def saml_logout(request: Request, sessionId: str = Depends(getSessionId), 
 sessionStorage: SessionStorage = Depends(getSessionStorage)):
@@ -193,4 +185,3 @@ async def saml_metadata(request: Request):
   else:
     print("Error found on Metadata: %s" % (', '.join(errors)))
     raise HTTPException(500, "Error in SP metadata.")
-"""
