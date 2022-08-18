@@ -11,7 +11,7 @@ def sample_health_check():
 router.add_api_route("/health", health([sample_health_check]), name="health-check", tags=["health"])
 
 
-from fastapi import HTTPException, Request, Response, APIRouter, Depends
+from fastapi import HTTPException, Request, Response, APIRouter, Depends, Form
 from typing import Any
 from starlette.responses import RedirectResponse
 
@@ -114,7 +114,6 @@ async def saml_login(request: Request):
     saml_client = get_saml_client(request)
     print("after saml_client")
     reqid, info = saml_client.prepare_for_authenticate()
-    print(info)
     print("after prepare for authenticate")
 
     redirect_url = None
@@ -139,39 +138,35 @@ sessionStorage: SessionStorage = Depends(getSessionStorage)):
   return response
 
 @router.post('/saml/callback', name="saml:callback")
-async def saml_login_callback(request: Request, response: Response, sessionStorage: SessionStorage = Depends(getSessionStorage)):
-    req = await prepare_from_fastapi_request(request, True)
-    auth = OneLogin_Saml2_Auth(req, get_saml_settings(request))
-    auth.process_response() # Process IdP response
-    errors = auth.get_errors() # This method receives an array with the errors
-    if len(errors) == 0:
-        if not auth.is_authenticated(): # This check if the response was ok and the user data retrieved or not (user authenticated)
-            return "user Not authenticated"
-        else:
-            attributes = auth.get_attributes()
+async def saml_login_callback(request: Request, response: Response, sessionStorage: SessionStorage = Depends(getSessionStorage), SAMLResponse = Form(...), RelayState = Form(None)):
+    saml_client = get_saml_client(request)
+    authn_response = saml_client.parse_authn_request_response(
+        SAMLResponse,
+        entity.BINDING_HTTP_POST)
+    authn_response.get_identity()
+    attributes = authn_response.get_subject()
 
-            user_login_json = {
-              "username":attributes['urn:mace:ucsd.edu:sso:ad:username'][0],
-              "role":"student",
-              "pid": "U0000000"
-            }
+    print(attributes)
 
-            
+    """
+    user_login_json = {
+        "username":attributes['urn:mace:ucsd.edu:sso:ad:username'][0],
+        "role":"student",
+        "pid": "U0000000"
+    }
 
-            setSession(response, user_login_json, sessionStorage)
+    setSession(response, user_login_json, sessionStorage)
 
-            if 'RelayState' in req['post_data'] and OneLogin_Saml2_Utils.get_self_url(req) != req['post_data']['RelayState']:
-                response_url = req['post_data']['RelayState']
-            else:
-                response_url = request.base_url
-                
-            response = RedirectResponse(response_url)
-            response.status_code = 302
-            
-            return response
+    """
+
+    if RelayState is not None:
+        response_url = RelayState
     else:
-        print("Error when processing SAML Response: %s %s" % (', '.join(errors), auth.get_last_error_reason()))
-        return "Error in callback"
+        response_url = request.base_url
+    
+    response = RedirectResponse(response_url)
+    response.status_code = 302
+    return response
     
 @router.get('/saml/metadata', name="saml:metadata")
 async def saml_metadata(request: Request):
