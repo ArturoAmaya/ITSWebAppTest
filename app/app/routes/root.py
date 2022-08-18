@@ -15,8 +15,6 @@ from fastapi import HTTPException, Request, Response, APIRouter, Depends, Form
 from typing import Any
 from starlette.responses import RedirectResponse
 
-from onelogin.saml2.auth import OneLogin_Saml2_Auth
-from onelogin.saml2.utils import OneLogin_Saml2_Utils
 from pathlib import Path
 import uuid
 from app.config.environment import get_settings
@@ -75,6 +73,7 @@ def get_saml_client(request: Request = Depends(Request)):
                     'logout_requests_signed': False,
                     'want_assertions_signed': True,
                     'want_response_signed': False,
+                    'allow_unknown_attributes': True
                 },
             },
             "metadata": {
@@ -129,13 +128,14 @@ async def saml_login(request: Request):
 @router.get('/saml/logout', name="saml:logout")
 async def saml_logout(request: Request, sessionId: str = Depends(getSessionId), 
 sessionStorage: SessionStorage = Depends(getSessionStorage)):
-  req = await prepare_from_fastapi_request(request)
-  auth = OneLogin_Saml2_Auth(req, get_saml_settings(request))
-  callback_url = auth.logout()
-  response = RedirectResponse(url=callback_url)
-  deleteSession(sessionId, sessionStorage)
-  response.delete_cookie(key="ssid")
-  return response
+  pass
+  # req = await prepare_from_fastapi_request(request)
+  # auth = OneLogin_Saml2_Auth(req, get_saml_settings(request))
+  # callback_url = auth.logout()
+  # response = RedirectResponse(url=callback_url)
+  # deleteSession(sessionId, sessionStorage)
+  # response.delete_cookie(key="ssid")
+  # return response
 
 @router.post('/saml/callback', name="saml:callback")
 async def saml_login_callback(request: Request, response: Response, sessionStorage: SessionStorage = Depends(getSessionStorage), SAMLResponse = Form(...), RelayState = Form(None)):
@@ -144,11 +144,8 @@ async def saml_login_callback(request: Request, response: Response, sessionStora
         SAMLResponse,
         entity.BINDING_HTTP_POST)
     authn_response.get_identity()
-    attributes = authn_response.get_subject()
+    attributes = authn_response.ava
 
-    print(attributes)
-
-    """
     user_login_json = {
         "username":attributes['urn:mace:ucsd.edu:sso:ad:username'][0],
         "role":"student",
@@ -156,8 +153,6 @@ async def saml_login_callback(request: Request, response: Response, sessionStora
     }
 
     setSession(response, user_login_json, sessionStorage)
-
-    """
 
     if RelayState is not None:
         response_url = RelayState
@@ -170,13 +165,14 @@ async def saml_login_callback(request: Request, response: Response, sessionStora
     
 @router.get('/saml/metadata', name="saml:metadata")
 async def saml_metadata(request: Request):
-  req = await prepare_from_fastapi_request(request)
-  auth = OneLogin_Saml2_Auth(req, get_saml_settings(request))
-  saml_settings = auth.get_settings()
-  metadata = saml_settings.get_sp_metadata()
-  errors = saml_settings.validate_metadata(metadata)
-  if len(errors) == 0:
-    return Response(content=metadata, media_type="application/xml")
-  else:
-    print("Error found on Metadata: %s" % (', '.join(errors)))
-    raise HTTPException(500, "Error in SP metadata.")
+  pass
+  # req = await prepare_from_fastapi_request(request)
+  # auth = OneLogin_Saml2_Auth(req, get_saml_settings(request))
+  # saml_settings = auth.get_settings()
+  # metadata = saml_settings.get_sp_metadata()
+  # errors = saml_settings.validate_metadata(metadata)
+  # if len(errors) == 0:
+  #   return Response(content=metadata, media_type="application/xml")
+  # else:
+  #   print("Error found on Metadata: %s" % (', '.join(errors)))
+  #   raise HTTPException(500, "Error in SP metadata.")
