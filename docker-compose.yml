@@ -1,0 +1,18 @@
+version: "3.9"
+
+services:
+  web:
+    container_name: python-webapp-archetype-container
+    build: .
+    #working_dir: /code/app
+    # must be uncommented if launch.json can't find python path; comment out once that's resolved
+    #command: uvicorn app.main:app --host 0.0.0.0 --reload 
+
+    environment:
+      DEBUG: 1
+    volumes:
+      #  - ./app:/code/app
+      - .:/code
+    #ports:
+    #  - 8080:8080
+    restart: on-failure
