@@ -60,26 +60,30 @@ def get_saml_client(request: Request = Depends(Request)):
                     (request.url_for("saml:logout"), BINDING_HTTP_REDIRECT)
                   ]
                 },
-					"requestedAuthnContext": {
-						"authn_context_class_ref": [
-							"urn:mace:ucsd.edu:sso:ad",
-							],
-						},
+                "requested_authn_context": {
+                  "authn_context_class_ref": [
+                    "urn:mace:ucsd.edu:sso:ad",
+                    "urn:mace:ucsd.edu:sso:actsso",
+                    "urn:mace:ucsd.edu:sso:studentsso",
+                    ],
+                  },
                     "required_attributes": ['urn:mace:ucsd.edu:sso:ad:username'],
                     "metadata_key_usage" : "both",
                     "enc_cert": "use",                               
                     'allow_unsolicited': True,                              
-                    'authn_requests_signed': False,
-                    'logout_requests_signed': False,
+                    'authn_requests_signed': True,
+                    'logout_requests_signed': True,
                     'want_assertions_signed': True,
-                    'want_response_signed': False,
+                    'want_response_signed': True,
                     'allow_unknown_attributes': True
                 },
             },
             "metadata": {
-                "local": [
-                    "app/config/idp.xml",  
-                ],
+                "remote": [
+                  {
+                    "url": "https://a5-stage.ucsd.edu/a5-stage-metadata-with-slo-signed.xml"
+                    }
+                ]
             },      
             "key_file": "app/config/sp-key.pem",        
             "cert_file": "app/config/sp-cert.pem",
@@ -138,8 +142,16 @@ async def saml_login(request: Request):
 @router.get('/saml/logout', name="saml:logout")
 async def saml_logout(request: Request, sessionId: str = Depends(getSessionId), 
 sessionStorage: SessionStorage = Depends(getSessionStorage)):
-  response = RedirectResponse(url=_SETTINGS.SSO_IDP_LOGOUT_URL)
+  # Determine IDP logout url
+  saml_client = get_saml_client(request)
+  entity_id = list(saml_client.metadata.with_descriptor("idpsso").keys())[0]
+  bindings_slo_supported = saml_client.metadata.single_logout_service(entity_id=entity_id, typ="idpsso")
+  logout_url = bindings_slo_supported[BINDING_HTTP_REDIRECT][0]["location"]
+  
+  # Clear local session data
   deleteSession(sessionId, sessionStorage)
+  
+  response = RedirectResponse(url=logout_url)
   response.delete_cookie(key="ssid")
   return response
 
@@ -149,9 +161,7 @@ async def saml_login_callback(request: Request, response: Response, sessionStora
     authn_response = saml_client.parse_authn_request_response(
         SAMLResponse,
         entity.BINDING_HTTP_POST)
-    authn_response.get_identity()
     attributes = authn_response.ava
-
     user_login_json = {
         "username":attributes['urn:mace:ucsd.edu:sso:ad:username'][0],
     }

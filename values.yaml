@@ -38,12 +38,6 @@ env:
       value: "Description here"
     - name: "SSO_SP_ENTITY_ID"
       value: "__SSO_SP_ENTITY_ID__" # https://dev-ats-pub.ucsd.edu
-    - name: "SSO_IDP_ENTITY_ID"
-      value: "__SSO_IDP_ENTITY_ID__" # https://dev-ats-pub.ucsd.edu
-    - name: "SSO_IDP_LOGIN_URL"
-      value: "__SSO_IDP_LOGIN_URL__"
-    - name: "SSO_IDP_LOGOUT_URL"
-      value: "__SSO_IDP_LOGOUT_URL__"
     - name: "APIM_TOKEN_URL"
       value: ""
     - name: "APIM_BASE_URL"
@@ -59,8 +53,6 @@ env:
       value: "emptyclientkey"
     - name: "APIM_SECRET_KEY"
       value: "emptysecretkey"
-    - name: "SSO_IDP_CERT"
-      value: "__SSO_IDP_CERT__"
     - name: "SSO_SP_CERT"
       value: "__SSO_SP_CERT__"
     - name: "SSO_SP_PRIVATE_KEY"
