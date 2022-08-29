@@ -18,4 +18,4 @@ RUN python3 -m pip install --no-cache-dir --upgrade -r /code/requirements.txt
 COPY ./app /code/app
 
 # add option --proxy-headers if contaier behind load balancer like nginx
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8080", "--proxy-headers", "--forwarded-allow-ips", "*"]
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8080", "--proxy-headers", "--forwarded-allow-ips", "*", "--ssl-keyfile=./app/config/local-key.pem", "--ssl-certfile=./app/config/local-cert.pem"]

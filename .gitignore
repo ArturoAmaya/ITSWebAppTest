@@ -127,3 +127,7 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+# sso cert and key
+sp-cert.pem
+sp-key.pem

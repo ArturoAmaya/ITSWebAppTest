@@ -48,6 +48,15 @@ def setSession(response: Response, session: Any, sessionStorage: SessionStorage)
     return sessionId
 
 def get_saml_client(request: Request = Depends(Request)):
+
+    callback_url = str(request.url_for("saml:callback"))
+
+    print(callback_url)
+
+    # if local, it'll point to      https://localhost:8080/saml/callback
+    #https://its-fztm633.ad.ucsd.edu:8080/saml/callback
+
+
     CONFIG = {
             'entityid': _SETTINGS.SSO_SP_ENTITY_ID,
             'service': {
@@ -142,18 +151,22 @@ async def saml_login(request: Request):
 @router.get('/saml/logout', name="saml:logout")
 async def saml_logout(request: Request, sessionId: str = Depends(getSessionId), 
 sessionStorage: SessionStorage = Depends(getSessionStorage)):
-  # Determine IDP logout url
-  saml_client = get_saml_client(request)
-  entity_id = list(saml_client.metadata.with_descriptor("idpsso").keys())[0]
-  bindings_slo_supported = saml_client.metadata.single_logout_service(entity_id=entity_id, typ="idpsso")
-  logout_url = bindings_slo_supported[BINDING_HTTP_REDIRECT][0]["location"]
-  
-  # Clear local session data
-  deleteSession(sessionId, sessionStorage)
-  
-  response = RedirectResponse(url=logout_url)
-  response.delete_cookie(key="ssid")
-  return response
+	# Determine IDP logout url
+	saml_client = get_saml_client(request)
+	entity_id = list(saml_client.metadata.with_descriptor("idpsso").keys())[0]
+	bindings_slo_supported = saml_client.metadata.single_logout_service(entity_id=entity_id, typ="idpsso")
+	logout_url = bindings_slo_supported[BINDING_HTTP_REDIRECT][0]["location"]
+
+	print(logout_url)
+
+	logout_url="https://a5-stage.ucsd.edu/tritON/profile/Logout"
+
+	# Clear local session data
+	deleteSession(sessionId, sessionStorage)
+
+	response = RedirectResponse(url=logout_url)
+	response.delete_cookie(key="ssid")
+	return response
 
 @router.post('/saml/callback', name="saml:callback")
 async def saml_login_callback(request: Request, response: Response, sessionStorage: SessionStorage = Depends(getSessionStorage), SAMLResponse = Form(...), RelayState = Form(None)):
@@ -162,6 +175,8 @@ async def saml_login_callback(request: Request, response: Response, sessionStora
         SAMLResponse,
         entity.BINDING_HTTP_POST)
     attributes = authn_response.ava
+
+    print(attributes)
     user_login_json = {
         "username":attributes['urn:mace:ucsd.edu:sso:ad:username'][0],
     }

@@ -1,0 +1,87 @@
+<ns0:EntityDescriptor xmlns:ns0="urn:oasis:names:tc:SAML:2.0:metadata" xmlns:ns1="urn:oasis:names:tc:SAML:metadata:algsupport"
+	xmlns:ns2="http://www.w3.org/2000/09/xmldsig#" entityID="https://localhost/pysaml2">
+	<ns0:Extensions>
+		<ns1:DigestMethod Algorithm="http://www.w3.org/2001/04/xmldsig-more#md5" />
+		<ns1:DigestMethod Algorithm="http://www.w3.org/2001/04/xmlenc#ripemd160" />
+		<ns1:DigestMethod	Algorithm="http://www.w3.org/2000/09/xmldsig#sha1" />
+		<ns1:DigestMethod Algorithm="http://www.w3.org/2001/04/xmldsig-more#sha224" />
+		<ns1:DigestMethod	Algorithm="http://www.w3.org/2001/04/xmlenc#sha256" />
+		<ns1:DigestMethod Algorithm="http://www.w3.org/2001/04/xmldsig-more#sha384" />
+		<ns1:DigestMethod Algorithm="http://www.w3.org/2001/04/xmlenc#sha512" />
+		<ns1:SigningMethod Algorithm="http://www.w3.org/2000/09/xmldsig#dsa-sha1" />
+		<ns1:SigningMethod Algorithm="http://www.w3.org/2009/xmldsig11#dsa-sha256" />
+		<ns1:SigningMethod Algorithm="http://www.w3.org/2001/04/xmldsig-more#ecdsa-sha1" />
+		<ns1:SigningMethod Algorithm="http://www.w3.org/2001/04/xmldsig-more#ecdsa-sha224" />
+		<ns1:SigningMethod Algorithm="http://www.w3.org/2001/04/xmldsig-more#ecdsa-sha256" />
+		<ns1:SigningMethod Algorithm="http://www.w3.org/2001/04/xmldsig-more#ecdsa-sha384" />
+		<ns1:SigningMethod Algorithm="http://www.w3.org/2001/04/xmldsig-more#ecdsa-sha512" />
+		<ns1:SigningMethod Algorithm="http://www.w3.org/2001/04/xmldsig-more#rsa-md5" />
+		<ns1:SigningMethod Algorithm="http://www.w3.org/2001/04/xmldsig-more#rsa-ripemd160" />
+		<ns1:SigningMethod Algorithm="http://www.w3.org/2000/09/xmldsig#rsa-sha1" />
+		<ns1:SigningMethod Algorithm="http://www.w3.org/2001/04/xmldsig-more#rsa-sha224" />
+		<ns1:SigningMethod Algorithm="http://www.w3.org/2001/04/xmldsig-more#rsa-sha256" />
+		<ns1:SigningMethod Algorithm="http://www.w3.org/2001/04/xmldsig-more#rsa-sha384" />
+		<ns1:SigningMethod Algorithm="http://www.w3.org/2001/04/xmldsig-more#rsa-sha512" />
+	</ns0:Extensions>
+	<ns0:SPSSODescriptor protocolSupportEnumeration="urn:oasis:names:tc:SAML:2.0:protocol" AuthnRequestsSigned="true" WantAssertionsSigned="true">
+		<ns0:KeyDescriptor use="signing">
+			<ns2:KeyInfo>
+				<ns2:X509Data>
+					<ns2:X509Certificate>MIIDazCCAlOgAwIBAgIEcuxZiTANBgkqhkiG9w0BAQsFADBmMQswCQYDVQQGEwJV
+UzELMAkGA1UECBMCQ0ExETAPBgNVBAcTCExhIEpvbGxhMRUwEwYDVQQKEwxVQyBT
+YW4gRGllZ28xDDAKBgNVBAsTA0lUUzESMBAGA1UEAxMJbG9jYWxob3N0MB4XDTIy
+MDgyMzE5NDc0MVoXDTMyMDgyMDE5NDc0MVowZjELMAkGA1UEBhMCVVMxCzAJBgNV
+BAgTAkNBMREwDwYDVQQHEwhMYSBKb2xsYTEVMBMGA1UEChMMVUMgU2FuIERpZWdv
+MQwwCgYDVQQLEwNJVFMxEjAQBgNVBAMTCWxvY2FsaG9zdDCCASIwDQYJKoZIhvcN
+AQEBBQADggEPADCCAQoCggEBAJh63ea/mNuCQwFXLRVVTP372XEcVP9GxT+Wlf4q
+UhD3vyeFbKVSe+8Dlnz3AKRAAsT99C/VriJCjd+IyjH0ARmzh13VdTp/r2Q7apeO
+xPwJrYMnH74zUErKJlwEXo+GGylEa9G+dNG8gd57GRqz5aebNDhTKgDgG2tAwDhQ
+QqvYLLIDNMtDiCfhtzl9RQwZE3LuRIJYIz0BzhAYdqfhawQEyZBDl9DSL05D5Okj
+zKPwoWLRUHw3u7R4CWuGuYtrgmZNg+EzQ1QHTNzCD6rW8BgBe3NsB6VpJqpZFeHF
+uutg/BKNRXtvYG7RFXmAgGI2MVV8MGzlOhrVza02146hEtECAwEAAaMhMB8wHQYD
+VR0OBBYEFN24GnbGWoWqzQLtut0tvZqi85pXMA0GCSqGSIb3DQEBCwUAA4IBAQBL
+po9ogJBoawOic91/8JFDzGqRq5tman+Mu8HBrUoo4PZqUiBrQUgNDOXk0KuioxKD
+43FE+pQAZHj7+cTisYbLv7d5WYjFq+tMW9wy4UHTkki0ewS5cu629sGBCuGwav15
+4dOyfPuVYsih4Rnj6T7EvxCNDGq2jWffTboF5L3iIOZE/z1vC4gCE3z/rCc0JfqF
+kjiuSlqLxx7dgAoxS0fc4id90M10mmFMVHdmCLJyb1yLv8T1/auyriQJcQeo5a1X
+UoCDBIAvypkUtwqJtGxJ80K4C0vBYKOymzMqBEZYQDdQnUxazjbVWZcvmHXwkrDz
+2udMtxbNeK0QG5u/hMc9</ns2:X509Certificate>
+				</ns2:X509Data>
+			</ns2:KeyInfo>
+		</ns0:KeyDescriptor>
+		<ns0:KeyDescriptor use="encryption">
+			<ns2:KeyInfo>
+				<ns2:X509Data>
+					<ns2:X509Certificate>MIIDazCCAlOgAwIBAgIEcuxZiTANBgkqhkiG9w0BAQsFADBmMQswCQYDVQQGEwJV
+UzELMAkGA1UECBMCQ0ExETAPBgNVBAcTCExhIEpvbGxhMRUwEwYDVQQKEwxVQyBT
+YW4gRGllZ28xDDAKBgNVBAsTA0lUUzESMBAGA1UEAxMJbG9jYWxob3N0MB4XDTIy
+MDgyMzE5NDc0MVoXDTMyMDgyMDE5NDc0MVowZjELMAkGA1UEBhMCVVMxCzAJBgNV
+BAgTAkNBMREwDwYDVQQHEwhMYSBKb2xsYTEVMBMGA1UEChMMVUMgU2FuIERpZWdv
+MQwwCgYDVQQLEwNJVFMxEjAQBgNVBAMTCWxvY2FsaG9zdDCCASIwDQYJKoZIhvcN
+AQEBBQADggEPADCCAQoCggEBAJh63ea/mNuCQwFXLRVVTP372XEcVP9GxT+Wlf4q
+UhD3vyeFbKVSe+8Dlnz3AKRAAsT99C/VriJCjd+IyjH0ARmzh13VdTp/r2Q7apeO
+xPwJrYMnH74zUErKJlwEXo+GGylEa9G+dNG8gd57GRqz5aebNDhTKgDgG2tAwDhQ
+QqvYLLIDNMtDiCfhtzl9RQwZE3LuRIJYIz0BzhAYdqfhawQEyZBDl9DSL05D5Okj
+zKPwoWLRUHw3u7R4CWuGuYtrgmZNg+EzQ1QHTNzCD6rW8BgBe3NsB6VpJqpZFeHF
+uutg/BKNRXtvYG7RFXmAgGI2MVV8MGzlOhrVza02146hEtECAwEAAaMhMB8wHQYD
+VR0OBBYEFN24GnbGWoWqzQLtut0tvZqi85pXMA0GCSqGSIb3DQEBCwUAA4IBAQBL
+po9ogJBoawOic91/8JFDzGqRq5tman+Mu8HBrUoo4PZqUiBrQUgNDOXk0KuioxKD
+43FE+pQAZHj7+cTisYbLv7d5WYjFq+tMW9wy4UHTkki0ewS5cu629sGBCuGwav15
+4dOyfPuVYsih4Rnj6T7EvxCNDGq2jWffTboF5L3iIOZE/z1vC4gCE3z/rCc0JfqF
+kjiuSlqLxx7dgAoxS0fc4id90M10mmFMVHdmCLJyb1yLv8T1/auyriQJcQeo5a1X
+UoCDBIAvypkUtwqJtGxJ80K4C0vBYKOymzMqBEZYQDdQnUxazjbVWZcvmHXwkrDz
+2udMtxbNeK0QG5u/hMc9</ns2:X509Certificate>
+				</ns2:X509Data>
+			</ns2:KeyInfo>
+		</ns0:KeyDescriptor>
+		<ns0:SingleLogoutService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect"
+			Location="https://its-fztm633.ad.ucsd.edu:8080/saml/logout" />
+		<ns0:AssertionConsumerService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST"
+			Location="https://its-fztm633.ad.ucsd.edu:8080/saml/callback"
+			index="1" />
+		<ns0:AttributeConsumingService index="1">
+			<ns0:ServiceName xml:lang="en" />
+			<ns0:RequestedAttribute Name="urn:mace:ucsd.edu:sso:ad:username" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:uri" isRequired="true" />
+		</ns0:AttributeConsumingService>
+	</ns0:SPSSODescriptor>
+</ns0:EntityDescriptor>
