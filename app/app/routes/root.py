@@ -51,11 +51,18 @@ def get_saml_client(request: Request = Depends(Request)):
 
     callback_url = str(request.url_for("saml:callback"))
 
-    print(callback_url)
-
     # if local, it'll point to      https://localhost:8080/saml/callback
     #https://its-fztm633.ad.ucsd.edu:8080/saml/callback
 
+    ###
+
+    if(_SETTINGS.ENV == "local"):
+        key_path = "/code/app/config/sp-key.pem"
+        cert_path = "/code/app/config/sp-cert.pem"
+
+    else:
+        key_path = "/var/secrets/SSO_SP_PRIVATE_KEY"
+        cert_path = "/var/secrets/SSO_SP_CERT"
 
     CONFIG = {
             'entityid': _SETTINGS.SSO_SP_ENTITY_ID,
@@ -94,13 +101,13 @@ def get_saml_client(request: Request = Depends(Request)):
                     }
                 ]
             },      
-            "key_file": "app/config/sp-key.pem",        
-            "cert_file": "app/config/sp-cert.pem",
+            "key_file": key_path,        
+            "cert_file": cert_path,
             "xmlsec_binary": '/usr/bin/xmlsec1',        
             'encryption_keypairs': [
             {
-                "key_file": "app/config/sp-key.pem",        
-                "cert_file": "app/config/sp-cert.pem",
+                "key_file": key_path,        
+                "cert_file": cert_path,
             },
             ],
             "organization": {
