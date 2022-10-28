@@ -9,7 +9,7 @@
 
 
 # Architecture
-This archetype is structured roughly following a hexagonal (or ports and adapters) architecture, with protocols defining the ports and with implementatations of the protocols and routes forming the adapters. Routes depend on the protocols and rely on dependecy injection to provide the correct implementation. Data access is modeled by a repository pattern.
+This template is structured roughly following a hexagonal (or ports and adapters) architecture, with protocols defining the ports and with implementatations of the protocols and routes forming the adapters. Routes depend on the protocols and rely on dependecy injection to provide the correct implementation. Data access is modeled by a repository pattern.
 
 ## Project Structure
 - `app/api` is the REST API layer where routes are defined. Code here can depend on code in the domain and infrastructure folders, though ideally on abstractions.
