@@ -23,7 +23,7 @@ templates = Jinja2Templates(directory="app/app/templates")
 async def list_movies(request: Request, movies_service = Depends(MoviesService), sessionStorage: SessionStorage = Depends(getSessionStorage)):
     movies = await movies_service.list_movies()
     return templates.TemplateResponse("movies/list_movies.html", {"request": request, "movies": movies}) 
-
+    #return {"msg": "Hello World"}
 @router.get("/add", name="movies:add-movie", response_class=HTMLResponse)
 async def add_movies(request: Request):
     session = await get_user_info(request)
