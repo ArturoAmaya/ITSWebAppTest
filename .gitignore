@@ -131,3 +131,6 @@ dmypy.json
 # sso cert and key
 sp-cert.pem
 sp-key.pem
+
+# the venv I'm working in
+itsapp/
