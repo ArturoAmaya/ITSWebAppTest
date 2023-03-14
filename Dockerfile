@@ -1,5 +1,6 @@
 # TODO: For local dev, execute docker login repository.ucsd.edu and enter your UCSD email and AD password when prompted
-FROM v-its-ciap-docker.repository.ucsd.edu/rhel/minimal/8.x/python/3.9/webapp:v15
+FROM v-its-ciap-docker.repository.ucsd.edu/rhel/minimal/8.x/python/3.9/webapp:v153
+#FROM http://registry.access.redhat.com/ubi8/ubi-minimal/minimal/8.x/python/3.9/
 
 # TODO: Probably remove this once a better local dev setup is worked out
 EXPOSE 8080
