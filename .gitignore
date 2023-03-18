@@ -134,3 +134,6 @@ sp-key.pem
 
 # the venv I'm working in
 itsapp/
+
+/app/infrastructure/files/
+/app/infrastructure/condensed.csv
