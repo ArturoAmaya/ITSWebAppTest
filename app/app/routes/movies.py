@@ -19,16 +19,16 @@ templates = Jinja2Templates(directory="app/app/templates")
 # which checks for a login cookie
 # this also depends on the sessionStorage variable being declared as a dependency to your routing function
 
-@router.get("/", name="movies:get-movies",response_class=HTMLResponse)
+@router.get("/", name="movies:get-movies", response_class=HTMLResponse)
 async def list_movies(request: Request, movies_service = Depends(MoviesService), sessionStorage: SessionStorage = Depends(getSessionStorage)):
     movies = await movies_service.list_movies()
     return templates.TemplateResponse("movies/list_movies.html", {"request": request, "movies": movies}) 
-    #return {"msg": "Hello World"}
+    #return "Hello world"
 @router.get("/add", name="movies:add-movie", response_class=HTMLResponse)
 async def add_movies(request: Request):
     session = await get_user_info(request)
-
     return templates.TemplateResponse("movies/add_movie.html", {"request": request}) 
+    
 
 @router.get("/edit/{movieId}", name="movies:edit-movie",response_class=HTMLResponse)
 async def edit_movie(request: Request, movieId: int, movies_service: MoviesServiceProtocol = Depends(MoviesService), sessionStorage: SessionStorage = Depends(getSessionStorage)):
