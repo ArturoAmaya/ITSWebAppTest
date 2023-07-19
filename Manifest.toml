@@ -64,7 +64,7 @@ version = "1.4.2"
 
 [[deps.CurricularAnalyticsDiff]]
 deps = ["CSV", "Crayons", "CurricularAnalytics", "DataStructures", "Documenter", "DocumenterTools", "JSON"]
-git-tree-sha1 = "5fb8409b45cb602ad0aec6753ef12f1886a29f99"
+git-tree-sha1 = "1a4f870b368ea815d75d79ed253d91182880ca81"
 repo-rev = "main"
 repo-url = "https://github.com/ArturoAmaya/CurricularAnalyticsDiff.jl"
 uuid = "8ef3bf4c-6f5d-446e-9bf1-598bf46b8e79"
