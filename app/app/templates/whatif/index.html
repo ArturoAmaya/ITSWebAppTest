@@ -1,0 +1,711 @@
+{% extends "base.html" %}
+{% block body %}
+<h1>What If</h1>
+<div class="pull-right">
+    <!--<a href="{{ url_for('movies:add-movie') }}" class="btn btn-primary"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span>Add movie</a>-->
+</div>
+<form action="" id="add-request">
+    <p>Please select the request you wish to add</p>
+    <input type="radio" id="add-course-choice"
+    name="request-choice" value="add-course">
+    <label for="add-course-choice">Add a course</label><br>
+    
+    <input type="radio" id="add-prereq-choice"
+    name="request-choice" value="add-prereq">
+    <label for="add-prereq-choice">Add a prereq</label><br>
+    
+    <input type="radio" id="remove-course-choice"
+    name="request-choice" value="remove-course">
+    <label for="remove-course-choice">Remove a course</label><br>
+    
+    <input type="radio" id="remove-prereq-choice"
+    name="request-choice" value="remove-prereq">
+    <label for="remove-prereq-choice">Remove a prereq</label><br>
+    
+    <input type="submit" value="Add">
+</form>
+
+
+<!--<button onclick="AddRequest()" id="button">Add a request</button>-->
+<div id="requests" style="visibility:hidden;"></div>
+<!--<table class="table table-striped">
+    <thead>
+        <tr><th>Title</th><th>Release Year</th><th>Description</th></tr>
+    </thead>
+    <tbody>
+        
+    </tbody>
+</table>-->
+
+<!--Script for defining the forms-->
+<script>
+    majors = [
+     "AA25" ,
+             "AN26" ,
+             "AN27" ,
+             "AN28" ,
+             "AN29" ,
+             "AN30" ,
+             "BE25" ,
+             "BE27" ,
+             "BE28" ,
+             "BE29" ,
+             "BI30" ,
+             "BI31" ,
+             "BI32" ,
+             "BI34" ,
+             "BI35" ,
+             "BI37" ,
+             "BI38" ,
+             "CE25" ,
+             "CG25" ,
+             "CG29" ,
+             "CG31" ,
+             "CG32" ,
+             "CG33" ,
+             "CG34" ,
+             "CG35" ,
+             "CH25" ,
+             "CH34" ,
+             "CH35" ,
+             "CH36" ,
+             "CH38" ,
+             "CL25" ,
+             "CM26" ,
+             "CN25" ,
+             "CR25" ,
+             "CS25" ,
+             "CS26" ,
+             "CS27" ,
+             "DS25" ,
+             "EC26" ,
+             "EC27" ,
+             "EC28" ,
+             "EC37" ,
+             "ED25" ,
+             "EN25" ,
+             "EN28" ,
+             "EN30" ,
+             "ES25" ,
+             "ES26" ,
+             "ES27" ,
+             "ES28" ,
+             "ET25" ,
+             "GH25" ,
+             "GH26" ,
+             "GL25" ,
+             "GS25" ,
+             "HI25" ,
+             "HS25" ,
+             "HS26" ,
+             "HS27" ,
+             "HS28" ,
+             "IS25" ,
+             "IS26" ,
+             "IS27" ,
+             "IS28" ,
+             "IS29" ,
+             "IS30" ,
+             "IS31" ,
+             "IS34" ,
+             "IS36" ,
+             "IT25" ,
+             "JA25" ,
+             "JS25" ,
+             "LA25" ,
+             "LA26" ,
+             "LA27" ,
+             "LN25" ,
+             "LN29" ,
+             "LN32" ,
+             "LN33" ,
+             "LN34" ,
+             "LT33" ,
+             "LT34" ,
+             "LT36" ,
+             "LT41" ,
+             "MA27" ,
+             "MA29" ,
+             "MA30" ,
+             "MA31" ,
+             "MA32" ,
+             "MA33" ,
+             "MA35" ,
+             "MC25" ,
+             "MC27" ,
+             "MC30" ,
+             "MC31" ,
+             "MC32" ,
+             "MC33" ,
+             "MC34" ,
+             "MU25" ,
+             "MU26" ,
+             "MU27" ,
+             "NA25" ,
+             "PB25" ,
+             "PB26" ,
+             "PB27" ,
+             "PB28" ,
+             "PB29" ,
+             "PB30" ,
+             "PB31" ,
+             "PC25" ,
+             "PC26" ,
+             "PC28" ,
+             "PC29" ,
+             "PC30" ,
+             "PC31" ,
+             "PC32" ,
+             "PC33" ,
+             "PC34" ,
+             "PC35" ,
+             "PL25" ,
+             "PS25" ,
+             "PS26" ,
+             "PS27" ,
+             "PS28" ,
+             "PS29" ,
+             "PS30" ,
+             "PS31" ,
+             "PS32" ,
+             "PS34" ,
+             "PY26" ,
+             "PY28" ,
+             "PY29" ,
+             "PY30" ,
+             "PY31" ,
+             "PY32" ,
+             "PY33" ,
+             "PY34" ,
+             "RE26" ,
+             "RU26" ,
+             "SE27" ,
+             "SI29" ,
+             "SI30" ,
+             "SI31" ,
+             "SO25" ,
+             "SO27" ,
+             "SO28" ,
+             "SO29" ,
+             "SO30" ,
+             "SO31" ,
+             "SO32" ,
+             "SO33" ,
+             "TH26" ,
+             "TH27" ,
+
+             "UN27" ,
+             "UNHA" ,
+             "UNPS" ,
+             "UNSS" ,
+
+             "US26" ,
+             "US27" ,
+             "VA26" ,
+             "VA27" ,
+             "VA28" ,
+             "VA29" ,
+             "VA30"
+    ]
+    colleges = ["FI", "MU", "RE", "SI", "SN", "TH", "SI"]
+    college_names = ["ERC", "MU", "RE", "SI", "SN", "TH", "SI"]
+
+    class AddCourse extends HTMLElement{
+        constructor(){
+            self = super();
+            const shadow = this.attachShadow({mode:'open'})
+
+            const p = document.createElement('p');
+            p.setAttribute('class', 'form-row');
+
+            const br = document.createElement('br');
+            shadow.appendChild(br.cloneNode(true))
+
+            const course_name = document.createElement('label');
+            course_name.innerHTML = "Type in the name of the proposed course:"
+            shadow.appendChild(course_name)
+            shadow.appendChild(br.cloneNode(true))
+
+            const course_name_input = document.createElement('input');
+            course_name_input.setAttribute('type', 'text');
+            course_name_input.setAttribute('required', 'required');
+            course_name_input.setAttribute('placeholder', 'ex. MATH 24G');
+            course_name_input.setAttribute('id', 'course')
+            shadow.appendChild(course_name_input)
+            shadow.appendChild(br.cloneNode(true))
+
+
+            const course_hours_label = document.createElement('label');
+            course_hours_label.innerHTML = "Type in the number of hours the proposed course will have:"
+            shadow.appendChild(course_hours_label)
+            shadow.appendChild(br.cloneNode(true))
+
+
+            const course_hours_input = document.createElement('input');
+            course_hours_input.setAttribute('type', 'text');
+            course_hours_input.setAttribute('required', 'required');
+            course_hours_input.setAttribute('placeholder', 'ex. 4.0');
+            course_hours_input.setAttribute('id', 'credit_hours');
+
+            shadow.appendChild(course_hours_input)
+            shadow.appendChild(br.cloneNode(true))
+
+
+            const prereqs_div = document.createElement('div');
+            prereqs_div.setAttribute('id', 'prereq-div');
+            let prereqs_p = document.createElement('label');
+            prereqs_p.innerHTML = "Add in prerequisites: "
+            prereqs_div.appendChild(prereqs_p)
+            //prereqs_div.appendChild(br.cloneNode(true))
+            let add_prereqs_btn = document.createElement('button');
+            add_prereqs_btn.innerHTML = "Add Prereq";
+            prereqs_div.appendChild(add_prereqs_btn)
+            //prereqs_div.appendChild(br.cloneNode(true))
+            shadow.appendChild(prereqs_div)
+
+
+            // Todo: dep stuff
+            const deps_div = document.createElement('div');
+            deps_div.setAttribute('id', 'dep-div');
+            let deps_p = document.createElement('label');
+            deps_p.innerHTML = "Add in dependencies: "
+            deps_div.appendChild(deps_p)
+            prereqs_div.appendChild(br.cloneNode(true))
+            let add_deps_btn = document.createElement('button');
+            add_deps_btn.innerHTML = "Add Dependency";
+            deps_div.appendChild(add_deps_btn)
+            deps_div.appendChild(br.cloneNode(true))
+            shadow.appendChild(deps_div)
+
+            const major_label = document.createElement('label');
+            major_label.innerHTML = "Select the majors this class will be in"
+            shadow.appendChild(major_label)
+            shadow.appendChild(br.cloneNode(true))
+
+
+            const major_select = document.createElement('select')
+            major_select.setAttribute('multiple', true)
+            for (let major in majors) {
+                let m = document.createElement('option')
+                m.innerHTML = majors[major]
+                m.setAttribute('value', majors[major])
+                major_select.appendChild(m)
+            }
+            shadow.appendChild(major_select)
+            shadow.appendChild(br.cloneNode(true))
+
+            for (let i = 0; i<colleges.length; i++){
+                let c = document.createElement('input')
+                c.setAttribute('type', 'checkbox')
+                c.setAttribute('name', colleges[i])
+                c.setAttribute('value', colleges[i])
+
+                let c2 = document.createElement('label')
+                c2.setAttribute('for', colleges[i])
+                c2.innerHTML = college_names[i]
+                shadow.appendChild(c2)
+                shadow.appendChild(c)
+            }
+            shadow.appendChild(br.cloneNode(true))
+
+            const delete_btn = document.createElement('button')
+            delete_btn.innerHTML = "Delete this form";
+            shadow.appendChild(delete_btn)
+            
+        }
+        connectedCallback(){
+            this.shadowRoot.lastElementChild.onclick = function(){this.parentNode.innerHTML='';}
+            this.shadowRoot.getElementById('prereq-div').querySelector('button').addEventListener("click", function(){
+                
+                const di = document.createElement('div');
+                
+                const label = document.createElement('label');
+                label.innerHTML = "Add in a prereq: "
+                const input = document.createElement('input')
+                input.setAttribute('type', 'text');
+                input.setAttribute('required', 'required');
+                input.setAttribute('placeholder', 'ex. MATH 20A');
+
+                const remove = document.createElement('button')
+                remove.innerHTML = "Remove"
+                remove.addEventListener("click", function(){
+                    this.parentElement.remove()
+                }, false)
+
+
+                di.appendChild(label)
+                di.appendChild(input)
+                di.appendChild(remove)
+                this.parentNode.appendChild(di)
+                //this.parentNode.appendChild(document.createElement('br'))
+
+            },false)
+        
+            this.shadowRoot.getElementById('dep-div').querySelector('button').addEventListener("click", function(){
+                
+                const di = document.createElement('div');
+                
+                const label = document.createElement('label');
+                label.innerHTML = "Add in a dependency: "
+                const input = document.createElement('input')
+                input.setAttribute('type', 'text');
+                input.setAttribute('required', 'required');
+                input.setAttribute('placeholder', 'ex. MATH 20A');
+
+                const remove = document.createElement('button')
+                remove.innerHTML = "Remove"
+                remove.addEventListener("click", function(){
+                    this.parentElement.remove()
+                }, false)
+
+
+                di.appendChild(label)
+                di.appendChild(input)
+                di.appendChild(remove)
+                this.parentNode.appendChild(di)
+                //this.parentNode.appendChild(document.createElement('br'))
+
+            },false)
+        
+        }
+    }
+    customElements.define('add-course', AddCourse)
+
+    class AddPrereq extends HTMLElement{
+        constructor(){
+            self = super();
+            const shadow = this.attachShadow({mode:'open'})
+
+            const p = document.createElement('p');
+            p.setAttribute('class', 'form-row');
+
+            const course_label = document.createElement('label');
+            course_label.innerHTML = "Type in the name of the class to get a new prerequisite: "
+            
+            const br = document.createElement('br')
+
+            const course = document.createElement('input');
+            course.setAttribute('type', 'text');
+            course.setAttribute('required', 'required');
+            course.setAttribute('placeholder', 'ex. MATH 20C');
+            course.setAttribute('id', 'course');
+
+            const prereq_label = document.createElement('label');
+            prereq_label.innerHTML = "Type in the name of the prereq to be added"
+            
+            const prereq = document.createElement('input');
+            prereq.setAttribute('type', 'text');
+            prereq.setAttribute('required', 'required');
+            prereq.setAttribute('placeholder', 'ex. CHEM 6A');
+            prereq.setAttribute('id', 'prereq');
+
+            const delete_btn = document.createElement('button')
+            delete_btn.innerHTML = "Delete this form";
+
+            shadow.appendChild(br.cloneNode(true))
+            shadow.appendChild(br.cloneNode(true))
+            shadow.appendChild(course_label)
+            shadow.appendChild(br.cloneNode(true))
+            shadow.appendChild(course)
+            shadow.appendChild(br.cloneNode(true))
+            shadow.appendChild(prereq_label)
+            shadow.appendChild(br.cloneNode(true))
+            shadow.appendChild(prereq)
+            shadow.appendChild(br.cloneNode(true))
+            shadow.appendChild(delete_btn)
+            //shadow.appendChild(br.cloneNode(true))
+
+        }
+        connectedCallback(){
+            this.shadowRoot.lastElementChild.onclick = function(){this.parentNode.innerHTML='';}
+        }
+    }
+    customElements.define('add-prereq', AddPrereq)
+
+
+    class RemoveCourse extends HTMLElement{
+        constructor(){
+            self=super();
+            const shadow = this.attachShadow({mode:'open'})
+
+            const p = document.createElement('p');
+            p.setAttribute('class', 'form-row');
+
+            const label = document.createElement('label');
+            label.innerHTML = "Type in the name of a class to remove: "
+
+            const course = document.createElement('input');
+            course.setAttribute('type', 'text');
+            course.setAttribute('required', 'required');
+            course.setAttribute('placeholder', 'ex. MATH 20A');
+            course.setAttribute('id', 'course');
+
+            const br = document.createElement('br')
+
+            const delete_btn = document.createElement('button')
+            delete_btn.innerHTML = "Delete this form";
+
+            shadow.appendChild(br.cloneNode(true))
+            //shadow.appendChild(p)
+            shadow.appendChild(br.cloneNode(true))
+            shadow.appendChild(label)
+            shadow.appendChild(br.cloneNode(true))
+            shadow.appendChild(course)
+            shadow.appendChild(br.cloneNode(true))
+            shadow.appendChild(delete_btn)
+            //shadow.appendChild(br.cloneNode(true))
+
+        }
+        connectedCallback(){
+            this.shadowRoot.lastElementChild.onclick = function(){this.parentNode.innerHTML='';}
+        }
+    }
+    customElements.define('remove-a-course', RemoveCourse)
+
+    class RemovePrereq extends HTMLElement{
+        constructor(){
+            self = super();
+            const shadow = this.attachShadow({mode:'open'})
+
+            const p = document.createElement('p');
+            p.setAttribute('class', 'form-row');
+
+            const course_label = document.createElement('label');
+            course_label.innerHTML = "Type in the name of the class to lose a prerequisite: "
+            
+            const br = document.createElement('br')
+
+            const course = document.createElement('input');
+            course.setAttribute('type', 'text');
+            course.setAttribute('required', 'required');
+            course.setAttribute('placeholder', 'ex. MATH 20C');
+            course.setAttribute('id', 'course');
+
+            const prereq_label = document.createElement('label');
+            prereq_label.innerHTML = "Type in the name of the prereq to be removed"
+            
+            const prereq = document.createElement('input');
+            prereq.setAttribute('type', 'text');
+            prereq.setAttribute('required', 'required');
+            prereq.setAttribute('placeholder', 'ex. MATH 20B');
+            prereq.setAttribute('id', 'prereq');
+
+            const delete_btn = document.createElement('button')
+            delete_btn.innerHTML = "Delete this form";
+
+            shadow.appendChild(br.cloneNode(true))
+            shadow.appendChild(br.cloneNode(true))
+            shadow.appendChild(course_label)
+            shadow.appendChild(br.cloneNode(true))
+            shadow.appendChild(course)
+            shadow.appendChild(br.cloneNode(true))
+            shadow.appendChild(prereq_label)
+            shadow.appendChild(br.cloneNode(true))
+            shadow.appendChild(prereq)
+            shadow.appendChild(br.cloneNode(true))
+            shadow.appendChild(delete_btn)
+            //shadow.appendChild(br.cloneNode(true))
+        }
+        connectedCallback(){
+            this.shadowRoot.lastElementChild.onclick = function(){this.parentNode.innerHTML='';}
+        }
+
+        
+    }
+    customElements.define('remove-prereq', RemovePrereq)
+</script>
+<!--Script for adding requests-->
+<script>
+    base_url = "/webapp-template/whatif/edit/compound-request/"
+    function submit(){
+
+        // also remove the empty ones
+        requests = document.getElementById('requests').childNodes
+        empties = []
+        for (let i= 0; i<requests.length; i++){
+            //console.log(requests[i])
+            try{
+                if (requests[i].shadowRoot.innerHTML == ''){
+                    empties.push(i)
+                }
+            } catch (error){
+                //console.error(error)
+                //console.log(requests[i])
+            }
+        }
+        empties.sort(function(a,b){
+            return b-a;
+        })
+         
+        for (let i = 0; i<empties.length; i++){
+            requests[empties[i]].remove()
+        }
+
+        // there's a simpler way but for now do this in blocks
+        di = document.getElementById("requests")
+        forms = di.children
+        const forms_to_submit = [];
+        for (let i=0; i<forms.length;i++){
+            console.log(forms[i])
+            let shadow = forms[i].shadowRoot
+            console.log(shadow.innerHTML)
+
+            
+            switch(forms[i].nodeName){
+                case 'ADD-COURSE':
+                    payload = new Object();
+                    payload['course'] = shadow.getElementById('course').value
+                    payload['credit_hours'] = shadow.getElementById('credit_hours').value
+                    prereqs = shadow.getElementById('prereq-div').querySelectorAll('div');
+                    p_prereqs = new Object();
+                    for (let p = 0; p<prereqs.length; p++){
+                        p_prereqs[prereqs[p].childNodes[1].value] = 'pre';
+                    }
+                    payload['prereqs'] = p_prereqs
+
+                    deps = shadow.getElementById('dep-div').querySelectorAll('div');
+                    p_deps = new Object();
+                    for (let p = 0; p<deps.length; p++){
+                        p_deps[deps[p].childNodes[1].value] = 'pre';
+                    }
+                    payload['dependencies'] = p_deps
+                    
+                    // TODO Plans:
+                    payload['nominal_plans'] = ['']
+                    request = new Object()
+                    request['command'] = 'add-course'
+                    request['payload'] = payload
+                    forms_to_submit.push(request)
+                    
+                    break
+                case 'ADD-PREREQ':
+                    payload = new Object();
+                    payload['course'] = shadow.getElementById('course').value
+                    payload['prereq'] = shadow.getElementById('prereq').value
+                    request = new Object();
+                    request['command'] = 'add-prereq'
+                    request['payload'] = payload
+                    forms_to_submit.push(request)
+                    break
+                case 'REMOVE-A-COURSE':
+                    payload = new Object();
+                    payload['course'] = shadow.getElementById('course').value
+                    request = new Object()
+                    request['command'] = 'remove-course';
+                    request['payload'] = payload;
+                    forms_to_submit.push(request)
+                    break
+                case 'REMOVE-PREREQ':
+                payload = new Object();
+                    payload['course'] = shadow.getElementById('course').value
+                    payload['prereq'] = shadow.getElementById('prereq').value
+                    request = new Object();
+                    request['command'] = 'remove-prereq'
+                    request['payload'] = payload
+                    forms_to_submit.push(request)
+                    break
+                default:
+                    //stuff
+            }
+
+        }
+        console.log(forms_to_submit)
+        //compound = new Object()
+        //compound['commands'] = forms_to_submit
+        compound = {'comands': forms}
+        console.log(JSON.stringify(forms_to_submit))
+        search = new URLSearchParams(JSON.stringify(forms_to_submit)).toString()
+        destination = "commands=" + search.slice(0, search.length-1)
+        console.log(destination)
+        window.location.href = base_url + "?" + destination
+        //window.location.href = base_url + "?" +"commands=%5B%7B%27command%27%3A+%27add-course%27%2C+%27payload%27%3A+%7B%27course%27%3A+%27MATH+3C%27%2C+%27credit_hours%27%3A+4.0%2C+%27prereqs%27%3A+%7B%7D%2C+%27dependencies%27%3A+%7B%27MATH+10A%27%3A+%27pre%27%2C+%27MATH+10A+%2F20A%27%3A+%27pre%27%2C+%27MATH+10A+%2FMATH+20A%27%3A+%27pre%27%2C+%27MATH+10A%2F20A%27%3A+%27pre%27%2C+%27MATH+10A%2F20A%2FMGT+3%27%3A+%27pre%27%2C+%27MATH+10A%2FMATH+20A%27%3A+%27pre%27%2C+%27MATH+20A%27%3A+%27pre%27%7D%2C+%27nominal_plans%27%3A+%5B%27%27%5D%7D%7D%2C+%7B%27command%27%3A+%27add-course%27%2C+%27payload%27%3A+%7B%27course%27%3A+%27MATH+3D%27%2C+%27credit_hours%27%3A+4.0%2C+%27prereqs%27%3A+%7B%7D%2C+%27dependencies%27%3A+%7B%27MATH+3C%27%3A+%27pre%27%7D%2C+%27nominal_plans%27%3A+%5B%27%27%5D%7D%7D%2C+%7B%27command%27%3A+%27add-course%27%2C+%27payload%27%3A+%7B%27course%27%3A+%27MATH+2B%27%2C+%27credit_hours%27%3A+4.0%2C+%27prereqs%27%3A+%7B%7D%2C+%27dependencies%27%3A+%7B%27MATH+3D%27%3A+%27pre%27%7D%2C+%27nominal_plans%27%3A+%5B%27%27%5D%7D%7D%5D"
+    }
+    const form = document.getElementById('add-request')
+    form.addEventListener('submit', function(event){
+        event.preventDefault();
+        console.log("Add a form")
+        if (document.querySelector('input[name="request-choice"]:checked').value != null){
+            document.getElementById('requests').style.visibility = ""
+            switch (document.querySelector('input[name="request-choice"]:checked').value){
+                case "add-course":
+                    console.log("add a course")
+                    add = document.createElement('add-course')
+                    console.log(document.getElementById('requests').childNodes)
+                    document.getElementById('requests').appendChild(add)
+                    break
+                case "add-prereq":
+                    console.log("add a prereq")
+                    add = document.createElement('add-prereq')
+                    console.log(document.getElementById('requests').childNodes)
+                    document.getElementById('requests').appendChild(add)
+                    break
+                case "remove-course":
+                    console.log("remove a course")
+                    remove = document.createElement('remove-a-course')
+                    console.log(document.getElementById('requests').childNodes)
+                    document.getElementById('requests').appendChild(remove)
+                    break
+                case "remove-prereq":
+                    console.log("remove a prereq")
+                    remove = document.createElement('remove-prereq')
+                    console.log(document.getElementById('requests').childNodes)
+                    document.getElementById('requests').appendChild(remove)
+                    break           
+            }
+            
+            // also remove the empty ones
+            requests = document.getElementById('requests').childNodes
+            empties = []
+            for (let i= 0; i<requests.length; i++){
+                //console.log(requests[i])
+                try{
+                    if (requests[i].shadowRoot.innerHTML == ''){
+                        empties.push(i)
+                    }
+                } catch (error){
+                    //console.error(error)
+                    //console.log(requests[i])
+                }
+            }
+            empties.sort(function(a,b){
+                return b-a;
+            })
+            
+            for (let i = 0; i<empties.length; i++){
+                requests[empties[i]].remove()
+            }
+        }
+        if (document.getElementById('form-submit') == null){
+            let sub = document.createElement('button')
+            sub.innerHTML = "Submit"
+            sub.setAttribute('id', 'form-submit')
+            sub.addEventListener("click", submit, false)
+            document.getElementById('requests').parentNode.appendChild(document.createElement('br'))
+            document.getElementById('requests').parentNode.appendChild(sub)
+        }
+    })
+</script>
+<script>
+    function AddRequest(){
+        form_div = document.getElementById('forms');
+        new_form = document.createElement("form")
+
+        FN = document.createElement("input");
+        FN.setAttribute("type", "text");
+        FN.setAttribute("name", "FullName");
+        FN.setAttribute("placeholder", "Full Name");
+        
+        s = document.createElement("input");
+        s.setAttribute("type", "submit");
+        s.setAttribute("value", "Submit");
+                 
+        // Append the full name input to the form
+        new_form.appendChild(FN);
+        new_form.appendChild(s);
+
+        form_div.appendChild(new_form)
+    }
+</script>
+
+
+{% endblock %}

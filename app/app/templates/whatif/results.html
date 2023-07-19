@@ -1,0 +1,132 @@
+{% extends "base.html" %}
+{% block body %}
+<h1>Results</h1>
+<div class="pull-right">
+    <!--<a href="{{ url_for('movies:add-movie') }}" class="btn btn-primary"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span>Add movie</a>-->
+</div>
+<table class="table table-striped">
+    <thead>
+        <tr><th rowspan="2">Major Code</th><th colspan="6">Curriculum</th><th colspan="6">MU</th><th colspan="6">RE</th><th colspan="6">SI</th><th colspan="6">SN</th><th colspan="6">TH</th><th colspan="6">WA</th><th colspan="6">ERC</th></tr>
+        <tr><td onclick="sortTable(1)">complexity change</td><td onclick="sortTable(2)">complexity change %</td><td onclick="sortTable(3)">longest path change</td><td onclick="sortTable(4)">longest path change %</td><td onclick="sortTable(5)">unit change</td><td onclick="sortTable(6)">new unit count</td><td onclick="sortTable(7)">complexity change</td><td onclick="sortTable(8)">complexity change %</td><td onclick="sortTable(9)">longest path change</td><td onclick="sortTable(10)">longest path change %</td><td onclick="sortTable(11)">unit change</td><td onclick="sortTable(12)">new unit count</td><td onclick="sortTable(13)">complexity change</td><td onclick="sortTable(14)">complexity change %</td><td onclick="sortTable(15)">longest path change</td><td onclick="sortTable(16)">longest path change %</td><td onclick="sortTable(17)">unit change</td><td onclick="sortTable(18)">new unit count</td><td onclick="sortTable(19)">complexity change</td><td onclick="sortTable(20)">complexity change %</td><td onclick="sortTable(21)">longest path change</td><td onclick="sortTable(22)">longest path change %</td><td onclick="sortTable(23)">unit change</td><td onclick="sortTable(24)">new unit count</td><td onclick="sortTable(25)">complexity change</td><td onclick="sortTable(26)">complexity change %</td><td onclick="sortTable(27)">longest path change</td><td onclick="sortTable(28)">longest path change %</td><td onclick="sortTable(29)">unit change</td><td onclick="sortTable(30)">new unit count</td><td onclick="sortTable(31)">complexity change</td><td onclick="sortTable(32)">complexity change %</td><td onclick="sortTable(33)">longest path change</td><td onclick="sortTable(34)">longest path change %</td><td onclick="sortTable(35)">unit change</td><td onclick="sortTable(36)">new unit count</td><td onclick="sortTable(37)">complexity change</td><td onclick="sortTable(38)">complexity change %</td><td onclick="sortTable(39)">longest path change</td><td onclick="sortTable(40)">longest path change %</td><td onclick="sortTable(41)">unit change</td><td onclick="sortTable(42)">new unit count</td><td onclick="sortTable(43)">complexity change</td><td onclick="sortTable(44)">complexity change %</td><td onclick="sortTable(45)">longest path change</td><td onclick="sortTable(46)">longest path change %</td><td onclick="sortTable(47)">unit change</td><td onclick="sortTable(48)">new unit count</td></tr>
+    </thead>
+    <tbody>
+        {% for row in results %}
+        <tr>
+            <td>{{row}}</td>
+            <td>{{results[row]["curriculum"]["complexity change"]}}</td>
+            <td>{{results[row]["curriculum"]["complexity change %"]}}</td>
+            <td>{{results[row]["curriculum"]["longest path change"]}}</td>
+            <td>{{results[row]["curriculum"]["longest path change %"]}}</td>
+            <td>{{results[row]["curriculum"]["unit change"]}}</td>
+            <td>{{results[row]["curriculum"]["new unit count"]}}</td>
+
+            <td>{{results[row]["MU"]["complexity change"]}}</td>
+            <td>{{results[row]["MU"]["complexity change %"]}}</td>
+            <td>{{results[row]["MU"]["longest path change"]}}</td>
+            <td>{{results[row]["MU"]["longest path change %"]}}</td>
+            <td>{{results[row]["MU"]["unit change"]}}</td>
+            <td>{{results[row]["MU"]["new unit count"]}}</td>
+
+            <td>{{results[row]["RE"]["complexity change"]}}</td>
+            <td>{{results[row]["RE"]["complexity change %"]}}</td>
+            <td>{{results[row]["RE"]["longest path change"]}}</td>
+            <td>{{results[row]["RE"]["longest path change %"]}}</td>
+            <td>{{results[row]["RE"]["unit change"]}}</td>
+            <td>{{results[row]["RE"]["new unit count"]}}</td>
+
+            <td>{{results[row]["SI"]["complexity change"]}}</td>
+            <td>{{results[row]["SI"]["complexity change %"]}}</td>
+            <td>{{results[row]["SI"]["longest path change"]}}</td>
+            <td>{{results[row]["SI"]["longest path change %"]}}</td>
+            <td>{{results[row]["SI"]["unit change"]}}</td>
+            <td>{{results[row]["SI"]["new unit count"]}}</td>
+
+            <td>{{results[row]["SN"]["complexity change"]}}</td>
+            <td>{{results[row]["SN"]["complexity change %"]}}</td>
+            <td>{{results[row]["SN"]["longest path change"]}}</td>
+            <td>{{results[row]["SN"]["longest path change %"]}}</td>
+            <td>{{results[row]["SN"]["unit change"]}}</td>
+            <td>{{results[row]["SN"]["new unit count"]}}</td>
+
+            <td>{{results[row]["TH"]["complexity change"]}}</td>
+            <td>{{results[row]["TH"]["complexity change %"]}}</td>
+            <td>{{results[row]["TH"]["longest path change"]}}</td>
+            <td>{{results[row]["TH"]["longest path change %"]}}</td>
+            <td>{{results[row]["TH"]["unit change"]}}</td>
+            <td>{{results[row]["TH"]["new unit count"]}}</td>
+
+            <td>{{results[row]["WA"]["complexity change"]}}</td>
+            <td>{{results[row]["WA"]["complexity change %"]}}</td>
+            <td>{{results[row]["WA"]["longest path change"]}}</td>
+            <td>{{results[row]["WA"]["longest path change %"]}}</td>
+            <td>{{results[row]["WA"]["unit change"]}}</td>
+            <td>{{results[row]["WA"]["new unit count"]}}</td>
+
+            <td>{{results[row]["FI"]["complexity change"]}}</td>
+            <td>{{results[row]["FI"]["complexity change %"]}}</td>
+            <td>{{results[row]["FI"]["longest path change"]}}</td>
+            <td>{{results[row]["FI"]["longest path change %"]}}</td>
+            <td>{{results[row]["FI"]["unit change"]}}</td>
+            <td>{{results[row]["FI"]["new unit count"]}}</td>
+
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+<script>
+    function sortTable(n) {
+    var table, rows, switching, i, x, y, shouldSwitch, dir, switchcount = 0;
+    table = document.getElementById('results');
+    switching = true;
+    // Set the sorting direction to ascending:
+    dir = 'asc';
+    /* Make a loop that will continue until
+    no switching has been done: */
+    while (switching) {
+      // Start by saying: no switching is done:
+      switching = false;
+      rows = table.rows;
+      /* Loop through all table rows (except the
+      first and second, which contains table headers): */
+      for (i = 2; i < (rows.length - 1); i++) {
+        // Start by saying there should be no switching:
+        shouldSwitch = false;
+        /* Get the two elements you want to compare,
+        one from current row and one from the next: */
+        x = rows[i].getElementsByTagName('TD')[n];
+        y = rows[i + 1].getElementsByTagName('TD')[n];
+        /* Check if the two rows should switch place,
+        based on the direction, asc or desc: */
+        if (dir == 'asc') {
+          if (Number(x.innerHTML) > Number(y.innerHTML)) {
+            // If so, mark as a switch and break the loop:
+            shouldSwitch = true;
+            break;
+          }
+        } else if (dir == 'desc') {
+          if (Number(x.innerHTML) < Number(y.innerHTML)) {
+            // If so, mark as a switch and break the loop:
+            shouldSwitch = true;
+            break;
+          }
+        }
+      }
+      if (shouldSwitch) {
+        /* If a switch has been marked, make the switch
+        and mark that a switch has been done: */
+        rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
+        switching = true;
+        // Each time a switch is done, increase this count by 1:
+        switchcount ++;
+      } else {
+        /* If no switching has been done AND the direction is 'asc',
+        set the direction to 'desc' and run the while loop again. */
+        if (switchcount == 0 && dir == 'asc') {
+          dir = 'desc';
+          switching = true;
+        }
+      }
+    }
+  }
+</script>
+{% endblock %}
