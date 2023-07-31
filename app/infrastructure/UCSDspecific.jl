@@ -29,31 +29,40 @@ using CurricularAnalytics
 # HELPER FNS ----------------------
 function has_match(catalog, course)
     # this could be a lot faster, tbh
-    ret = false
     for potential_match in catalog
-        if potential_match.name == course.name
-            ret = true
-            break
+        if ((potential_match.prefix * " " * potential_match.num) == (course.prefix * " " * course.num) || (potential_match.prefix * " " * potential_match.num) == course.name) && (potential_match.prefix != "" && potential_match.num != "")
+            return true
         end
     end
-    ret
+    for potential_match in catalog
+        if potential_match.name == course.name
+            return true
+        end
+    end
+    return false
 end
 
 function add_course_copy!(catalog, course)
+
     copy = Course(course.name, course.credit_hours)
+    copy.prefix = course.prefix
+    copy.num = course.num
     push!(catalog, copy)
     copy
 end
 
 function get_course_copy(catalog, course)
-    ret = 0
     for c in catalog
-        if c.name == course.name
-            ret = c
-            break
+        if ((c.prefix * " " * c.num) == course.name || (c.prefix * " " * c.num) == course.prefix * " " * course.num) && (c.prefix != "" && c.num != "")
+            return c
         end
     end
-    ret
+    for c in catalog
+        if c.name == course.name
+            return c
+        end
+    end
+    return 0
 end
 
 function edit_canonical_name(addition, course)
@@ -69,7 +78,7 @@ function condense(first_step=true::Bool)
     end
     for (root, dirs, files) in walkdir(dir)
         for file in files
-            println(file)
+            println(root * file)
             read = read_csv(joinpath(root, file))
             if typeof(read) == DegreePlan
                 curr = read.curriculum
@@ -78,6 +87,9 @@ function condense(first_step=true::Bool)
             end
             #Loop through courses in each curriculum:
             for course in curr.courses
+                if (course.prefix * " " * course.num) == "MATH 109"
+                    println("hi")
+                end
                 if !(has_match(catalog, course))
                     # add copy of course to catalog
                     copy = add_course_copy!(catalog, course)
@@ -129,3 +141,5 @@ function condense(first_step=true::Bool)
         write_csv(new_curriculum, "./app/infrastructure/files/condensed_temp.csv")
     end
 end
+
+#condense()
