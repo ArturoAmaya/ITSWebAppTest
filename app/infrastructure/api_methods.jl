@@ -302,7 +302,8 @@ end
 
 function add_course_compound(course_name::AbstractString, credit_hours::Real, prereqs::Dict, dependencies::Dict, condensed::Curriculum, nominal_plans::Vector{String}, df::DataFrame, plans::Dict, new_plans::Dict)
     try
-        results = Dict()
+        #results = Dict()
+        results = new_plans
         affected = add_course_institutional(course_name, condensed, credit_hours, prereqs, dependencies)
         affected_plans = filter(x -> x != "", union!(nominal_plans, affected))
         for plan in affected_plans
@@ -329,7 +330,7 @@ function add_course_compound(course_name::AbstractString, credit_hours::Real, pr
             # add an empty course in
             new_curr = add_course(course_name, curr, credit_hours, Dict(), Dict())
             for (preq, type) in prereqs
-                if preq in courses_to_course_names(curr.courses)
+                if (preq in courses_to_course_names(curr.courses)) || (preq in [c.prefix * " " * c.num for c in curr.courses])
                     # hook up the prereq
                     println("all good with $preq in $major $college")
                     add_requisite!(course_from_name(preq, new_curr), course_from_name(course_name, new_curr), pre)
@@ -411,7 +412,8 @@ end
 
 function add_prereq_compound(course_name::AbstractString, prereq::AbstractString, condensed::Curriculum, df::DataFrame, plans::Dict, new_plans::Dict)
     try
-        results = Dict()
+        #results = Dict()
+        results = new_plans
         affected = add_prereq_institutional(condensed, course_name, prereq)
         affected_plans = filter(x -> x != "", affected)
         for plan in affected_plans
@@ -457,7 +459,8 @@ end
 ## record complexity & unit score differences
 function remove_prereq_inst_web(target_name::AbstractString, prereq_name::AbstractString, condensed::Curriculum, plans::Dict)
     try
-        results = Dict()
+        #results = Dict()
+        results = new_plans
         # 2) get the list of plans
         affected = delete_prerequisite_institutional(target_name, prereq_name, condensed)
         # 3) for each plan
@@ -495,7 +498,8 @@ end
 
 function remove_prereq_compound(target_name::AbstractString, prereq_name::AbstractString, condensed::Curriculum, plans::Dict, new_plans::Dict)
     try
-        results = Dict()
+        #results = Dict()
+        results = new_plans
         affected = delete_prerequisite_institutional(target_name, prereq_name, condensed)
         affected_plans = filter(x -> x != "", affected)
         println(affected)
