@@ -1,6 +1,6 @@
 using CSV, SimpleWebsockets, HTTP, CurricularAnalytics, CurricularAnalyticsDiff, JSON, Sockets
-println(pwd())
-println(readdir("./app/infrastructure/"))
+#println(pwd())
+#println(readdir("./app/infrastructure/"))
 #include("./app/infrastructure/api_methods.jl")
 
 # UCSD curriculum
@@ -263,7 +263,7 @@ end
 
 #----------------------------------------------------------------------------------
 # fill out the table based on results
-function html_table(results::Dict{Any,Any})
+function html_table(results::Dict{Any,Any}, debug::Bool=false)
     # basic htm components
     table_start = "<table id='results'>"
     row_start = "<tr>"
@@ -290,8 +290,8 @@ function html_table(results::Dict{Any,Any})
     # make them vectors for consistent iteration through them
     header_count = sort(collect(header_count))
     sub_header_count = sort(collect(sub_header_count))
-    println(length(header_count))
-    println(length(sub_header_count))
+    #debug && println(length(header_count))
+    #debug && println(length(sub_header_count))
     header_start = "<th colspan='$(length(sub_header_count))'>"
     # assemble the header
     for header in header_count
@@ -339,7 +339,7 @@ function html_table(results::Dict{Any,Any})
     end     
 
     # then populate the results
-    println(keys(results))
+    #debug && println(keys(results))
 
     # end the table
     html = html * table_end
@@ -354,10 +354,10 @@ end
 #------------------------------------------------------------------------------------
 # parameter sanitizer functions
 # TODO the normal ones
-function sanitize_add_course_institutional(param_string::Vector{SubString{String}})
+function sanitize_add_course_institutional(param_string::Vector{SubString{String}}, debug::Bool=false)
     # there are supposed to be 8 entries here
-    println("cleaning: parameter string")
-    println(param_string)
+    debug && println("cleaning: parameter string")
+    debug && println(param_string)
     if length(param_string) < 8
         throw(ArgumentError("There's a weird number of paramters here, we need at least eight."))
     end
@@ -392,8 +392,8 @@ function sanitize_add_course_institutional(param_string::Vector{SubString{String
         push!(plan_codes, major * "curriculum")
     end
     sort!(plan_codes)
-    println("plan codes")
-    println(plan_codes)
+    debug && println("plan codes")
+    debug && println(plan_codes)
     # there's a few extra things to do here
     # 1) turn things into the dict format
     # 2) remove the empty ones
@@ -477,7 +477,7 @@ function add_pre_norm(req::HTTP.Request)
 end
 
 # remove course normally
-function rem_cou_norm(req::HTTP.Request)
+function rem_cou_norm(req::HTTP.Request, debug::Bool=false)
     #println("showing req")
     #@show req
     #println("showing req.method")
@@ -490,15 +490,15 @@ function rem_cou_norm(req::HTTP.Request)
 
     # the straight up string version seems to work fine. This is a very ugly method, though.
     bod = String(req.body)
-    println("full bod")
-    println(bod)
+    debug && println("full bod")
+    debug && println(bod)
     dirty_params = split(bod, "-----------------------------")
-    println("first dirty param")
-    println(dirty_params[1])
-    println("second dirty param")
-    println(dirty_params[2])
-    println("third dirty param")
-    println(dirty_params[3])
+    debug && println("first dirty param")
+    debug && println(dirty_params[1])
+    debug && println("second dirty param")
+    debug && println(dirty_params[2])
+    debug && println("third dirty param")
+    debug && println(dirty_params[3])
 
     csv = split(dirty_params[2], "\n")[5:end-3]
     open("newfile.csv", "w") do file
@@ -509,8 +509,8 @@ function rem_cou_norm(req::HTTP.Request)
     end
     # double check the type, could be degree plan, or nothing at all
     curr = read_csv("./newfile.csv")
-    println("curriculum!")
-    println(curr)
+    debug && println("curriculum!")
+    debug && println(curr)
     HTTP.Response(200, "Simple Dummy Response - You want to remove a course normally, \nhere is the longest path $(longest_paths(curr.curriculum))")
 end
 
@@ -520,7 +520,7 @@ function rem_pre_norm(req::HTTP.Request)
 end
 
 # add course institutional
-function add_cou_inst(req::HTTP.Request)
+function add_cou_inst(req::HTTP.Request, debug::Bool=false)
     request_string = String(req.body)
     request_strings = split(request_string, "&")
     try
@@ -530,8 +530,8 @@ function add_cou_inst(req::HTTP.Request)
 
         # clean the parameters
         clean_params = sanitize_add_course_institutional(request_strings[2:end])
-        println("clean params")
-        println(clean_params)
+        debug && println("clean params")
+        debug && println(clean_params)
 
         condensed = read_csv("./files/condensed2.csv")
         results = add_course_inst_web(clean_params[1], clean_params[2], clean_params[3], clean_params[4], condensed, clean_params[5])
@@ -555,7 +555,7 @@ function add_cou_inst(req::HTTP.Request)
 end
 
 # add prereq institutional
-function add_pre_inst(req::HTTP.Request)
+function add_pre_inst(req::HTTP.Request, debug::Bool=false)
     request_string = String(req.body)
     request_strings = split(request_string, "&")
     try
@@ -565,8 +565,8 @@ function add_pre_inst(req::HTTP.Request)
 
         # clean params
         clean_params = sanitize_add_prereq_institutional(request_strings[2:end])
-        println("clean params")
-        println(clean_params)
+        debug && println("clean params")
+        debug && println(clean_params)
 
         results = add_prereq_inst_web(clean_params[1], clean_params[2])
         html_results = institutional_response_first_half * html_table(results) * institutional_response_second_half
@@ -590,19 +590,19 @@ function add_pre_inst(req::HTTP.Request)
 end
 
 # remove_course_institutional
-function rem_cou_inst(req::HTTP.Request)
+function rem_cou_inst(req::HTTP.Request, debug::Bool=false)
     request_string = String(req.body)
     request_strings = split(request_string, "&")
     try
         clean_params = ""
         affected = ""
         html_resp = ""
-        println("request strings")
-        println(request_strings)
+        debug && println("request strings")
+        debug && println(request_strings)
         # clean params
         clean_params = sanitize_remove_course_institutional(request_strings[2:end])
-        println("clean params")
-        println(clean_params)
+        debug && println("clean params")
+        debug && println(clean_params)
 
         results = remove_course_inst_web(clean_params[1])
         html_results = institutional_response_first_half * html_table(results) * institutional_response_second_half
@@ -628,7 +628,7 @@ function rem_cou_inst(req::HTTP.Request)
 end
 
 # remove prereq institutional
-function rem_pre_inst(req::HTTP.Request)
+function rem_pre_inst(req::HTTP.Request, debug::Bool=false)
     request_string = String(req.body)
     request_strings = split(request_string, "&")
     try
@@ -637,8 +637,8 @@ function rem_pre_inst(req::HTTP.Request)
         html_resp = ""
 
         clean_params = sanitize_remove_prereq_institutional(request_strings[2:end])
-        println("clean params")
-        println(clean_params)
+        debug && println("clean params")
+        debug && println(clean_params)
 
         results = remove_prereq_inst_web(clean_params[1], clean_params[2])
         html_results = institutional_response_first_half * html_table(results) * institutional_response_second_half
