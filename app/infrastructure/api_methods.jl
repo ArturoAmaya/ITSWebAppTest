@@ -1,7 +1,7 @@
 using CurricularAnalytics, CurricularAnalyticsDiff, DataFrames, CSV
 include("./UCSDspecific.jl")
 
-function read_base()
+function read_base(debug::Bool=false)
     plans = Dict()
     for (root, dirs, files) in walkdir("./app/infrastructure/files/output/")
         for file in files
@@ -15,7 +15,8 @@ function read_base()
             splits = split(root * file, "/")
             major = splits[6][1:4]
             college = chop(splits[6], head=0, tail=4)[5:end]
-            println("major college $major, $college")
+            # apparently julia's way of doing a ternary operator with no else
+            debug && println("major college $major, $college")
             try
                 plans[major]
             catch
@@ -57,7 +58,7 @@ function analyze_results(base_plans::Dict, new_plans::Dict)
     return results
 end
 
-function condense_mem(plans::Dict, new_plans::Dict)
+function condense_mem(plans::Dict, new_plans::Dict, debug::Bool=false)
     catalog = Array{Course,1}([])
     majors = sort(collect(keys(plans)))
     for major in majors
@@ -76,7 +77,7 @@ function condense_mem(plans::Dict, new_plans::Dict)
                     copy = add_course_copy!(catalog, course)
                     # edit canonical name
                     edit_canonical_name("$(major)$(college)", copy)
-                    print("addition: $(major)$(college)")
+                    debug && print("addition: $(major)$(college)")
                 else
                     # edit canonical name
                     edit_canonical_name("$(major)$(college)", get_course_copy(catalog, course))
@@ -117,11 +118,11 @@ function condense_mem(plans::Dict, new_plans::Dict)
 end
 
 
-function cumulative()
+function cumulative(debug::Bool=false)
     results = Dict()
     for (root, dirs, files) in walkdir("./app/infrastructure/files/temp/")
         for file in files
-            println("path: ", joinpath(root, file))
+            debug && println("path: ", joinpath(root, file))
             temp = read_csv(joinpath(root, file))
             base = read_csv(joinpath(replace(root, "temp" => "output"), file))
             if typeof(temp) == DegreePlan
@@ -137,7 +138,7 @@ function cumulative()
             splits = split(root * file, "/")
             major = splits[6][1:4]
             college = chop(splits[6], head=0, tail=4)[5:end]
-            println("major college $major, $college")
+            debug && println("major college $major, $college")
             try
                 results[major]
             catch
@@ -170,7 +171,7 @@ function cumulative()
     return results
 end
 # This is for when prereqs are being added implicitly. We do the best job we can to accomodate
-function add_dyno_prereq(new_course::AbstractString, prereq::AbstractString, curr::Curriculum, prereq_chains::DataFrame)
+function add_dyno_prereq(new_course::AbstractString, prereq::AbstractString, curr::Curriculum, prereq_chains::DataFrame, debug::Bool=false)
     # look at the dataframe to find prereq
     fil = filter(:"Course ID" => x -> strip(x) == replace(prereq, " " => ""), prereq_chains)
     if size(fil)[1] == 0 || prereq == "MATH 20A"
@@ -178,7 +179,7 @@ function add_dyno_prereq(new_course::AbstractString, prereq::AbstractString, cur
         new_curr = add_course(prereq, curr, 4.0, Dict(), Dict(new_course => pre))
     else
         # else:
-        println(fil)
+        debug && println(fil)
         #stripped_names = [strip(i) for i in fil[:"Prereq Course ID"]]
         if typeof(fil[:"Prereq Sequence ID"][end]) == Missing
             # if the prereq is the beginning of the chain, just add it in with standard units and hook it up
@@ -198,7 +199,7 @@ function add_dyno_prereq(new_course::AbstractString, prereq::AbstractString, cur
                 for row in range(1, size(prereq_cluster)[1])
                     push!(prereq_names, strip(prereq_cluster[row, :"Prereq Subject Code"]) * " " * strip(prereq_cluster[row, "Prereq Course Number"]))
                 end
-                println(prereq_names)
+                debug && println(prereq_names)
 
                 ## ok having the pure names loop through now
                 found = false
@@ -234,7 +235,7 @@ function add_dyno_prereq(new_course::AbstractString, prereq::AbstractString, cur
 end
 
 
-function add_course_inst_web(course_name::AbstractString, credit_hours::Real, prereqs::Dict, dependencies::Dict, condensed::Curriculum, nominal_plans::Vector{String}, plans::Dict, df::DataFrame)
+function add_course_inst_web(course_name::AbstractString, credit_hours::Real, prereqs::Dict, dependencies::Dict, condensed::Curriculum, nominal_plans::Vector{String}, plans::Dict, df::DataFrame, debug::Bool=false)
     try
         results = Dict()
         # skip 0) the curric is passed in
@@ -246,7 +247,7 @@ function add_course_inst_web(course_name::AbstractString, credit_hours::Real, pr
             major = plan[1:4]
             college = plan[5:end]
             curr = plans[major][college]
-            println("$major $college")
+            debug && println("$major $college")
             try
                 results[major]
             catch
@@ -259,11 +260,11 @@ function add_course_inst_web(course_name::AbstractString, credit_hours::Real, pr
             for (preq, type) in prereqs
                 if preq in courses_to_course_names(curr.courses)
                     # hook up the prereq
-                    println("all good with $preq in $major $college")
+                    debug && println("all good with $preq in $major $college")
                     add_requisite!(course_from_name(preq, new_curr), course_from_name(course_name, new_curr), pre)
                 else
                     # add the prereq
-                    println("issue with $preq in $major $college -  add it in from the curriculum")
+                    debug && println("issue with $preq in $major $college -  add it in from the curriculum")
                     new_curr = add_dyno_prereq(course_name, preq, new_curr, df)
                 end
             end
@@ -275,8 +276,8 @@ function add_course_inst_web(course_name::AbstractString, credit_hours::Real, pr
                     #add_requisite!(course_from_name(course_name, new_curr), course_from_name(dep, new_curr), pre)
                 end # else do nothing
             end
-            println("new curr CH: $(new_curr.credit_hours)")
-            println("old curr CH: $(curr.credit_hours)")
+            debug && println("new curr CH: $(new_curr.credit_hours)")
+            debug && println("old curr CH: $(curr.credit_hours)")
             ## don't run diff, just check the total credit hours and complexity scores 
             ch_diff = new_curr.credit_hours - curr.credit_hours
             complex_diff = complexity(new_curr)[1] - complexity(curr)[1] # consider using complexity(curr)
@@ -300,7 +301,7 @@ function add_course_inst_web(course_name::AbstractString, credit_hours::Real, pr
     end
 end
 
-function add_course_compound(course_name::AbstractString, credit_hours::Real, prereqs::Dict, dependencies::Dict, condensed::Curriculum, nominal_plans::Vector{String}, df::DataFrame, plans::Dict, new_plans::Dict)
+function add_course_compound(course_name::AbstractString, credit_hours::Real, prereqs::Dict, dependencies::Dict, condensed::Curriculum, nominal_plans::Vector{String}, df::DataFrame, plans::Dict, new_plans::Dict, debug::Bool=false)
     try
         #results = Dict()
         results = new_plans
@@ -309,7 +310,7 @@ function add_course_compound(course_name::AbstractString, credit_hours::Real, pr
         for plan in affected_plans
             major = plan[1:4]
             college = plan[5:end]
-            println("$(major) $college")
+            debug && println("$(major) $college")
             try
                 results[major]
             catch
@@ -317,12 +318,12 @@ function add_course_compound(course_name::AbstractString, credit_hours::Real, pr
             end
             curr = nothing
             try
-                #println("trying newplans")
+                #debug && println("trying newplans")
                 curr = new_plans[major][college]
             catch
-                #println("trying old plans")
+                #debug && println("trying old plans")
                 curr = plans[major][college]
-                #println(plans[major][college])
+                #debug && println(plans[major][college])
             end
             new_curr = curr
             # add in the course and if all of its prereqs are there already, then it's all good
@@ -332,11 +333,11 @@ function add_course_compound(course_name::AbstractString, credit_hours::Real, pr
             for (preq, type) in prereqs
                 if (preq in courses_to_course_names(curr.courses)) || (preq in [c.prefix * " " * c.num for c in curr.courses])
                     # hook up the prereq
-                    println("all good with $preq in $major $college")
+                    debug && println("all good with $preq in $major $college")
                     add_requisite!(course_from_name(preq, new_curr), course_from_name(course_name, new_curr), pre)
                 else
                     # add the prereq
-                    println("issue with $preq in $major $college -  add it in from the curriculum")
+                    debug && println("issue with $preq in $major $college -  add it in from the curriculum")
                     new_curr = add_dyno_prereq(course_name, preq, new_curr, df)
                 end
             end
@@ -410,7 +411,7 @@ function add_prereq_inst_web(course_name::AbstractString, prereq::AbstractString
     end
 end
 
-function add_prereq_compound(course_name::AbstractString, prereq::AbstractString, condensed::Curriculum, df::DataFrame, plans::Dict, new_plans::Dict)
+function add_prereq_compound(course_name::AbstractString, prereq::AbstractString, condensed::Curriculum, df::DataFrame, plans::Dict, new_plans::Dict, debug::Bool=false)
     try
         #results = Dict()
         results = new_plans
@@ -419,7 +420,7 @@ function add_prereq_compound(course_name::AbstractString, prereq::AbstractString
         for plan in affected_plans
             major = plan[1:4]
             college = plan[5:end]
-            println("$(major) $college")
+            debug && println("$(major) $college")
             try
                 results[major]
             catch
@@ -427,12 +428,12 @@ function add_prereq_compound(course_name::AbstractString, prereq::AbstractString
             end
             curr = nothing
             try
-                #println("trying newplans")
+                #debug && println("trying newplans")
                 curr = new_plans[major][college]
             catch
-                #println("trying old plans")
+                #debug && println("trying old plans")
                 curr = plans[major][college]
-                #println(plans[major][college])
+                #debug && println(plans[major][college])
             end
             new_curr = curr
             try
@@ -457,7 +458,7 @@ end
 ## remove the prereq
 ## run diff (maybe not)
 ## record complexity & unit score differences
-function remove_prereq_inst_web(target_name::AbstractString, prereq_name::AbstractString, condensed::Curriculum, plans::Dict)
+function remove_prereq_inst_web(target_name::AbstractString, prereq_name::AbstractString, condensed::Curriculum, plans::Dict, debug::Bool=false)
     try
         #results = Dict()
         results = new_plans
@@ -465,7 +466,7 @@ function remove_prereq_inst_web(target_name::AbstractString, prereq_name::Abstra
         affected = delete_prerequisite_institutional(target_name, prereq_name, condensed)
         # 3) for each plan
         affected_plans = filter(x -> x != "", affected)
-        println(affected)
+        debug && println(affected)
         for plan in affected_plans
             major = plan[1:4]
             college = plan[5:end]
@@ -496,17 +497,17 @@ function remove_prereq_inst_web(target_name::AbstractString, prereq_name::Abstra
     end
 end
 
-function remove_prereq_compound(target_name::AbstractString, prereq_name::AbstractString, condensed::Curriculum, plans::Dict, new_plans::Dict)
+function remove_prereq_compound(target_name::AbstractString, prereq_name::AbstractString, condensed::Curriculum, plans::Dict, new_plans::Dict, debug::Bool=false)
     try
         #results = Dict()
         results = new_plans
         affected = delete_prerequisite_institutional(target_name, prereq_name, condensed)
         affected_plans = filter(x -> x != "", affected)
-        println(affected)
+        debug && println(affected)
         for plan in affected_plans
             major = plan[1:4]
             college = plan[5:end]
-            println("$(major) $college")
+            debug && println("$(major) $college")
             try
                 results[major]
             catch
@@ -514,12 +515,12 @@ function remove_prereq_compound(target_name::AbstractString, prereq_name::Abstra
             end
             curr = nothing
             try
-                #println("trying newplans")
+                #debug && println("trying newplans")
                 curr = new_plans[major][college]
             catch
-                #println("trying old plans")
+                #debug && println("trying old plans")
                 curr = plans[major][college]
-                #println(plans[major][college])
+                #debug && println(plans[major][college])
             end
             new_curr = remove_prereq(target_name, prereq_name, curr)
             results[major][college] = new_curr
@@ -539,17 +540,17 @@ end
 ## delete the course
 ## run diff (maybe not)
 ## record complexity & unit score differences
-function remove_course_inst_web(course_name::AbstractString, condensed::Curriculum, plans::Dict)
+function remove_course_inst_web(course_name::AbstractString, condensed::Curriculum, plans::Dict, debug::Bool=false)
     try
         results = Dict()
         # 1)
         course = course_from_name(course_name, condensed)
         # 2) get the list of plans from the condensed course
         affected_plans = filter(x -> x != "", split(course.canonical_name, ","))
-        println(affected_plans)
+        debug && println(affected_plans)
         # 3) for each plan
         for plan in affected_plans
-            println(plan)
+            debug && println(plan)
             ## read the plan csv
             # this is weird and hardcoded, but it should work
             major = plan[1:4]
@@ -582,7 +583,7 @@ function remove_course_inst_web(course_name::AbstractString, condensed::Curricul
     end
 end
 
-function remove_course_compound(course_name::AbstractString, condensed::Curriculum, plans::Dict, new_plans::Dict)
+function remove_course_compound(course_name::AbstractString, condensed::Curriculum, plans::Dict, new_plans::Dict, debug::Bool=false)
     try
         results = Dict()
         course = course_from_name(course_name, condensed)
@@ -590,7 +591,7 @@ function remove_course_compound(course_name::AbstractString, condensed::Curricul
         for plan in affected_plans
             major = plan[1:4]
             college = plan[5:end]
-            println("$(major) $college")
+            debug && println("$(major) $college")
             try
                 results[major]
             catch
@@ -598,12 +599,12 @@ function remove_course_compound(course_name::AbstractString, condensed::Curricul
             end
             curr = nothing
             try
-                #println("trying newplans")
+                #debug && println("trying newplans")
                 curr = new_plans[major][college]
             catch
-                #println("trying old plans")
+                #debug && println("trying old plans")
                 curr = plans[major][college]
-                #println(plans[major][college])
+                #debug && println(plans[major][college])
             end
             ## delete the course from it
             new_curr = remove_course(course_name, curr)
