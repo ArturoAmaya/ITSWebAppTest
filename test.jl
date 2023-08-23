@@ -1,8 +1,8 @@
 include("./app/infrastructure/api_methods.jl")
-big_curric = read_csv("./app/infrastructure/files/condensed2.csv")
+#big_curric = read_csv("./app/infrastructure/files/condensed2.csv")
 condensed = read_csv("./app/infrastructure/files/condensed2.csv")
 prereq_df = DataFrame(CSV.File("./app/infrastructure/files/prereqs.csv"))
-plans = read_base()
+plans = read_base(true)
 new_plans = Dict()
 
 #= Test for adding MATH 109 and its '/' variations properly
@@ -58,20 +58,21 @@ println(results2)
 =#
 
 # add a class to specific unrelated majors then delete it
-#=new_plans = add_course_compound("MATH 30", 5.0, Dict("MATH 20D" => pre), Dict("MATH 20E" => pre), condensed, ["", "BI37RE"], prereq_df, plans, new_plans)
-new_condensed = condense_mem(plans, new_plans)
-new_plans = add_prereq_compound("MATH 30", "CSE 11", new_condensed, prereq_df, plans, new_plans)
-new_condensed = condense_mem(plans, new_plans)
-new_plans = remove_course_compound("MATH 30", new_condensed, plans, new_plans)
+new_plans = add_course_compound("MATH 30", 5.0, Dict("MATH 20D" => pre), Dict("MATH 20E" => pre), condensed, ["", "BI37RE"], prereq_df, plans, new_plans, true)
+new_condensed = condense_mem(plans, new_plans, true)
+new_plans = add_prereq_compound("MATH 30", "CSE 11", new_condensed, prereq_df, plans, new_plans, true)
+new_condensed = condense_mem(plans, new_plans, true)
+new_plans = remove_course_compound("MATH 30", new_condensed, plans, new_plans, true)
 results = analyze_results(plans, new_plans)
 println(results)
 
 new_plans2 = Dict()
-new_plans2 = add_course_compound("MATH 30", 5.0, Dict("MATH 20D" => pre, "CSE 11" => pre), Dict("MATH 20E" => pre), condensed, ["", "BI37RE"], prereq_df, plans, new_plans2)
-new_condensed2 = condense_mem(plans, new_plans2)
-new_plans2 = remove_course_compound("MATH 30", new_condensed2, plans, new_plans2)
+new_plans2 = add_course_compound("MATH 30", 5.0, Dict("MATH 20D" => pre, "CSE 11" => pre), Dict("MATH 20E" => pre), condensed, ["", "BI37RE"], prereq_df, plans, new_plans2, true)
+new_condensed2 = condense_mem(plans, new_plans2, true)
+new_plans2 = remove_course_compound("MATH 30", new_condensed2, plans, new_plans2, true)
 results2 = analyze_results(plans, new_plans2)
-println(results2)=#
+println(results2)
+# took 565.761 s (1253134090 allocations: 40.65 GiB)
 # the result here is that we add 16 units - MATH 20B, MATH 20C, MATH 20D and CSE 11. The issue is that 10B is already there. isn't that a vliad prereq? Apaprently not! this is good news!
 # it uses the canonical choice of MATH 10B/MATH 20B being MATH 10B, which is not a prereq for 20C, so it has to add that in with 20B having 10B as a prereq.
 # importantly the added course is gone
@@ -134,3 +135,6 @@ for major in keys(new_plans)
     end
 end
 println(issue)
+#All good here =#
+# Timing test
+#Came out to 632 seconds min runtime
