@@ -1,5 +1,5 @@
 include("./api_methods.jl")
-function mod_add_course_inst_web(course_name::AbstractString, credit_hours::Real, prereqs::Dict, dependencies::Dict, curr::Curriculum, nominal_plans::Vector{String})
+function mod_add_course_inst_web(course_name::AbstractString, credit_hours::Real, prereqs::Dict, dependencies::Dict, curr::Curriculum, nominal_plans::Vector{String}, debug::Bool=false)
     try
         df = DataFrame(CSV.File("./app/infrastructure/files/prereqs.csv"))
         results = Dict()
@@ -14,7 +14,7 @@ function mod_add_course_inst_web(course_name::AbstractString, credit_hours::Real
             try
                 curr = read_csv("./app/infrastructure/files/output/$(major)/$(college).csv")
             catch
-                println("$(major)$(college) plan not found")
+                debug && println("$(major)$(college) plan not found")
                 continue
             end
             if typeof(curr) == DegreePlan
@@ -32,11 +32,11 @@ function mod_add_course_inst_web(course_name::AbstractString, credit_hours::Real
             for (preq, type) in prereqs
                 if preq in courses_to_course_names(curr.courses)
                     # hook up the prereq
-                    println("all good with $preq in $major $college")
+                    debug && println("all good with $preq in $major $college")
                     add_requisite!(course_from_name(preq, new_curr), course_from_name(course_name, new_curr), pre)
                 else
                     # add the prereq
-                    println("issue with $preq in $major $college -  add it in from the curriculum")
+                    debug && println("issue with $preq in $major $college -  add it in from the curriculum")
                     new_curr = add_dyno_prereq(course_name, preq, new_curr, df)
                 end
             end
