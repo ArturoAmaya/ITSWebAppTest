@@ -69,7 +69,7 @@ function edit_canonical_name(addition, course)
     course.canonical_name = course.canonical_name * ",$(addition)"
 end
 
-function condense(first_step=true::Bool)
+function condense(first_step=true::Bool, debug::Bool=false)
     catalog = Array{Course,1}([])
     if first_step
         dir = "./app/infrastructure/files/output/"
@@ -78,7 +78,7 @@ function condense(first_step=true::Bool)
     end
     for (root, dirs, files) in walkdir(dir)
         for file in files
-            println(root * file)
+            debug && println(root * file)
             read = read_csv(joinpath(root, file))
             if typeof(read) == DegreePlan
                 curr = read.curriculum
@@ -88,7 +88,7 @@ function condense(first_step=true::Bool)
             #Loop through courses in each curriculum:
             for course in curr.courses
                 if (course.prefix * " " * course.num) == "MATH 109"
-                    println("hi")
+                    debug && println("hi")
                 end
                 if !(has_match(catalog, course))
                     # add copy of course to catalog
@@ -96,7 +96,7 @@ function condense(first_step=true::Bool)
                     # edit canonical name
                     edit_canonical_name("$(root[end-3:end])$(file[1:end-4])", copy)
 
-                    println("addition: $(root[end-3:end])$(file[1:end-4])")
+                    debug && println("addition: $(root[end-3:end])$(file[1:end-4])")
                 else
                     # edit canonical name
                     edit_canonical_name("$(root[end-3:end])$(file[1:end-4])", get_course_copy(catalog, course))
