@@ -18,14 +18,14 @@ def sort_results(results):
     mykeys = list(results.keys())
     mykeys.sort()
     sorted_results = {i: results[i] for i in mykeys}
-    print(results.keys())
+    #print(results.keys())
     for major in sorted_results:
-        print(major)
-        print(sorted_results[major])
+        #print(major)
+        #print(sorted_results[major])
         for college in sorted_results[major]:
-            print(college)
+            #print(college)
             for stat in sorted_results[major][college]:
-                print(stat)
+                #print(stat)
                 sorted_results[major][college][stat] = round(sorted_results[major][college][stat], 2)
     return sorted_results
 
@@ -109,9 +109,9 @@ async def compound_request(request: Request, commands, sessionStorage: SessionSt
     #criterias = eval(criterias)
     #print(criterias[0])
     #return criterias
-    print(commands) 
+    #print(commands) 
     commands = eval(commands)
-    print("looping")
+    #print("looping")
     first_step = True
     future_chain = False
     if len(commands) > 0:
@@ -126,8 +126,8 @@ async def compound_request(request: Request, commands, sessionStorage: SessionSt
         match command['command']:
             case 'add-course':
                 # add stuff
-                print("add course")
-                print(command['payload'])
+                #print("add course")
+                #print(command['payload'])
                 Main.course = command['payload']['course']
                 Main.credit_hours = float(command['payload']['credit_hours'])
                 Main.prereqs = command['payload']['prereqs']
@@ -142,35 +142,35 @@ async def compound_request(request: Request, commands, sessionStorage: SessionSt
                 Main.eval("temp = Dict()")
                 Main.eval("for (preq, type) in dependencies; if type==\"pre\"; temp[preq] = pre; end; end")
                 Main.eval("dependencies = deepcopy(temp)")
-                Main.eval('println("prereqs ", prereqs)')
-                Main.eval('println("deps ", dependencies)') 
+                #Main.eval('println("prereqs ", prereqs)')
+                #Main.eval('println("deps ", dependencies)') 
                 Main.nominal_plans = command['payload']['nominal_plans']
                 
-                Main.eval('println("$course, $(credit_hours), $prereqs, $dependencies, $(nominal_plans)")')
+                #Main.eval('println("$course, $(credit_hours), $prereqs, $dependencies, $(nominal_plans)")')
 
                 Main.eval('new_plans = add_course_compound(course, credit_hours, prereqs, dependencies, new_condensed, nominal_plans, prereq_df, plans, new_plans)')
                 Main.eval('new_condensed = condense_mem(plans, new_plans)')
             case 'remove-course': 
                 # remove stuff
-                print(command['payload']['course'])
-                print("remove-course")
+                #print(command['payload']['course'])
+                #print("remove-course")
                 Main.course = command['payload']['course']
                 Main.eval('new_plans = remove_course_compound(course, new_condensed, plans, new_plans)')
                 Main.eval('new_condensed = condense_mem(plans, new_plans)')
             case 'add-prereq': 
                 # add prereq stuff
-                print("add-prereq")
-                print(command['payload']['course'])
-                print(command['payload']['prereq'])
+                #print("add-prereq")
+                #print(command['payload']['course'])
+                #print(command['payload']['prereq'])
                 Main.course = command['payload']['course']
                 Main.prereq = command['payload']['prereq']
                 Main.eval('new_plans = add_prereq_compound(course, prereq, new_condensed, prereq_df, plans, new_plans)')
                 Main.eval('new_condensed = condense_mem(plans, new_plans)')
             case 'remove-prereq': 
                 # remove prereq stuff
-                print(command['payload']['course'])
-                print(command['payload']['prereq'])
-                print("remove-prereq")
+                #print(command['payload']['course'])
+                #print(command['payload']['prereq'])
+                #print("remove-prereq")
                 Main.course = command['payload']['course']
                 Main.prereq = command['payload']['prereq']
                 Main.eval('new_plans = remove_prereq_compound(course, prereq, new_condensed, plans, new_plans)')
@@ -183,13 +183,13 @@ async def compound_request(request: Request, commands, sessionStorage: SessionSt
     results = Main.results 
     sorted_results = sort_results(results) 
     sorted_results = pad_results(sorted_results)
-    print(sorted_results) 
+    #print(sorted_results) 
     return templates.TemplateResponse("whatif/results.html", {"request":request, "results":sorted_results})
 
 @router.get("/edit/add-course/", name="whatif:add-course",response_class=HTMLResponse)
 async def add_course(request: Request, course: str, credit_hours: float, prereqs, dependencies, nominal_plans, sessionStorage: SessionStorage = Depends(getSessionStorage)):
-    print(course, credit_hours, prereqs, dependencies, nominal_plans)
-    print(type(course), type(credit_hours), type(prereqs), type(dependencies), type(nominal_plans)) 
+    #print(course, credit_hours, prereqs, dependencies, nominal_plans)
+    #print(type(course), type(credit_hours), type(prereqs), type(dependencies), type(nominal_plans)) 
     Main.course = course 
     Main.hours = credit_hours
     Main.prereqs = eval(prereqs)
@@ -200,26 +200,26 @@ async def add_course(request: Request, course: str, credit_hours: float, prereqs
     Main.eval("temp = Dict()") 
     Main.eval("for (preq, type) in dependencies; if type==\"pre\"; temp[preq] = pre; end; end")
     Main.eval("dependencies = deepcopy(temp)") 
-    Main.eval('println("prereqs ", prereqs)')
-    Main.eval('println("deps ", dependencies)') 
+    #Main.eval('println("prereqs ", prereqs)')
+    #Main.eval('println("deps ", dependencies)') 
     Main.nominal_plans = eval(nominal_plans)
     Main.eval('results = add_course_inst_web(course, hours, prereqs, dependencies, condensed, nominal_plans, plans, prereq_df)')
     results = Main.results 
     mykeys = list(results.keys()) 
     mykeys.sort()
     sorted_results = {i: results[i] for i in mykeys}
-    print(results.keys()) 
+    #print(results.keys()) 
     for major in sorted_results:
-        print(major)
-        print(sorted_results[major])
+        #print(major)
+        #print(sorted_results[major])
         for college in sorted_results[major]: 
-            print(college)
+            #print(college)
             for stat in sorted_results[major][college]:
-                print(stat) 
+                #print(stat) 
                 sorted_results[major][college][stat] = round(sorted_results[major][college][stat], 2)
-    print(type(sorted_results))
+    #print(type(sorted_results))
     sorted_results = pad_results(sorted_results)
-    print(sorted_results)
+    #print(sorted_results)
     return templates.TemplateResponse("whatif/results.html", {"request":request, "results":sorted_results})
 
 @router.get("/edit/add-prereq/", name="whatif:add-prereq",response_class=HTMLResponse)
@@ -230,14 +230,14 @@ async def add_prereq(request: Request, course: str, prereq:str, sessionStorage: 
     results = Main.results
     sorted_results = sort_results(results) 
     sorted_results = pad_results(sorted_results)
-    print(sorted_results)
+    #print(sorted_results)
     return templates.TemplateResponse("whatif/results.html", {"request":request, "results":sorted_results})
 
 @router.get("/edit/remove-course/", name="whatif:remove-course",response_class=HTMLResponse)
 async def remove_course(request: Request, course: str, sessionStorage: SessionStorage = Depends(getSessionStorage)):
     Main.course = course
     Main.eval('results = remove_course_inst_web(course, condensed, plans)')
-    Main.eval("println(results)")
+    #Main.eval("println(results)")
     results = Main.results
     sorted_results = sort_results(results) 
     sorted_results = pad_results(sorted_results)
@@ -251,7 +251,7 @@ async def remove_prereq(request: Request, course: str, prereq:str, sessionStorag
     results = Main.results
     sorted_results = sort_results(results) 
     sorted_results = pad_results(sorted_results)
-    print(sorted_results)
+    #print(sorted_results)
     return templates.TemplateResponse("whatif/results.html", {"request":request, "results":sorted_results})
 
 
